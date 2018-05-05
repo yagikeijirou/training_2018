@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="jp" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="adminLayout">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/admin-lte/plugins/timepicker/bootstrap-timepicker.min.css}"
+          href="../../static/lib/admin-lte/plugins/timepicker/bootstrap-timepicker.min.css"/>
+</head>
+<body>
+<div class="ui container" layout:fragment="content" th:remove="tag">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+    </section>
+
+
+</div>
+<div layout:fragment="script" th:remove="tag">
+    <script th:src="@{/js/admin/listOutput.js}"
+            src="../../static/js/admin/listOutput.js"></script>
+
+    <script th:src="@{/lib/admin-lte/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js}"
+            src="../../static/lib/admin-lte/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+
+    <script th:src="@{/lib/admin-lte/bower_components/bootstrap-datepicker/dist/locales/bootstrap-datepicker.ja.min.js}"
+            src="../../static/lib/admin-lte/bower_components/bootstrap-datepicker/dist/locales/bootstrap-datepicker.ja.min.js"></script>
+</div>
+</body>
+</html>

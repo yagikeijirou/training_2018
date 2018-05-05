@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="jp" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="adminLayout">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta charset="utf-8"/>
+    <!-- Select2 -->
+    <link rel="stylesheet" th:href="@{/lib/admin-lte/bower_components/select2/dist/css/select2.min.css}"
+          href="../../static/lib/admin-lte/bower_components/select2/dist/css/bootstrap.min.css" />
+</head>
+<body>
+<div class="ui container" layout:fragment="content" th:remove="tag">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+    </section>
+
+
+</div>
+<div layout:fragment="script" th:remove="tag">
+    <!-- Select2 -->
+    <script src="../../static/lib/admin-lte/bower_components/select2/dist/js/select2.min.js"
+            th:src="@{/lib/admin-lte/bower_components/select2/dist/js/select2.min.js}"></script>
+    <!-- JsRender -->
+    <script th:src="@{/lib/jsrender/jsrender.min.js}"
+            src="../../static/lib/jsrender/jsrender.min.js"></script>
+    <script th:src="@{/js/admin/user-org.js}"
+            src="../../static/js/admin/user-org.js"></script>
+
+    <script id="org-record-tmpl" type="text/x-jsrender">
+        <tr class="clickable" onclick="findUser('{{:orgCd}}')">
+            <td class="vert-align col-md-4">
+                {{:orgCd}}
+            </td>
+            <td class="vert-align col-md-7">
+                {{:orgName}}
+            </td>
+            <td class="vert-align col-md-1">
+                <a class="btn btn-xs btn-info" onclick="openUpdateOrg('{{:orgCd}}')" href="#">
+                    <i class="fa fa-pencil"></i>
+                </a>
+            </td>
+            <td class="vert-align col-md-1">
+                <i class="fa fa-minus text-danger" onclick="handleDeleteOrg('{{:orgCd}}')"></i>
+            </td>
+        </tr>
+    </script>
+
+    <script id="user-record-tmpl" type="text/x-jsrender">
+        <tr>
+            <td class="vert-align col-md-1">
+                <input type="checkbox" name="userIds" value="{{:userId}}" class="checkUser"/>
+            </td>
+            <td class="vert-align col-md-2">
+                {{:userId}}
+            </td>
+            <td class="vert-align col-md-2">
+                {{:authName}}
+            </td>
+            <td class="vert-align col-md-2">
+                {{:orgName}}
+            </td>
+            <td class="vert-align col-md-2">
+                {{:name}}
+            </td>
+            <td class="vert-align col-md-2">
+                {{:mail}}
+            </td>
+            <td class="vert-align col-md-1">
+                <a class="btn btn-xs btn-info" href="#" onclick="openUpdateUser({{:userId}})">
+                    <i class="fa fa-pencil"></i>
+                </a>
+            </td>
+        </tr>
+    </script>
+</div>
+
+</body>
+</html>
