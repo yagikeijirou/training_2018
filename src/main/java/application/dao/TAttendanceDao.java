@@ -63,28 +63,30 @@ public class TAttendanceDao extends AbstractDao<TAttendance> {
 	 * ユーザID、出勤日で勤怠情報を取得する。（＝あるユーザの指定月の勤怠情報一覧）
 	 *
 	 * @param userId ユーザID
-	 * @param attendanceDay 出勤日
+	 * @param attendanceMonth 出勤年月（yyyyMM）
 	 * @return 勤怠情報エンティティリスト
 	 */
-	//FIXME: 現状、attendanceDayで指定した年月日のみ表示（その月全部ではない）
-	public List<TAttendance> getByUserIdAndAttendanceDay(Integer userId, String attendanceDay) {
+	//TODO: 引数を年月にして、その月のリストが出るように修正。
+	public List<TAttendance> getByUserIdAndAttendanceMonth(Integer userId, String attendanceMonth) {
+		String date1;
+		String date2;
 		Map<String, Object> cond = new HashMap<>();
 		cond.put("userId", userId);
-		cond.put("attendanceDay", attendanceDay);
-		return sqlTemplate.forList("sql/TAttendanceDao/selectByUserIdAndAttendanceDay.sql", TAttendance.class, cond);
+		cond.put("attendanceDay", attendanceMonth);
+		return sqlTemplate.forList("sql/TAttendanceDao/selectByUserIdAndAttendanceMonth.sql", TAttendance.class, cond);
 	}
 
 	/**
 	 * 出勤日で勤怠情報を取得する。（＝全ユーザの指定月の勤怠情報一覧）
 	 *
-	 * @param attendanceDay 出勤日
+	 * @param attendanceMonth 出勤年月（yyyyMM）
 	 * @return 勤怠情報エンティティリスト
 	 */
-	//FIXME: 現状、attendanceDayで指定した年月日のみ表示（その月全部ではない）
-	public List<TAttendance> getByAttendanceDay(Integer userId, String attendanceDay) {
+	//TODO: 引数を年月にして、その月のリストが出るように修正。
+	public List<TAttendance> getByAttendanceMonth(Integer userId, String attendanceMonth) {
 		Map<String, Object> cond = new HashMap<>();
-		cond.put("attendanceDay", attendanceDay);
-		return sqlTemplate.forList("sql/TAttendanceDao/selectByAttendanceDay.sql", TAttendance.class, cond);
+		cond.put("attendanceDay", attendanceMonth);
+		return sqlTemplate.forList("sql/TAttendanceDao/selectByAttendanceMonth.sql", TAttendance.class, cond);
 	}
 
 
