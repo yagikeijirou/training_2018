@@ -81,7 +81,7 @@ public class AdminController {
      */
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public String login() {
-        return "admin/login";
+        return "admin/login";//@Controllerのついたクラスでは、""内はURLとみなされる
     }
 
     /**
@@ -121,6 +121,7 @@ public class AdminController {
      *
      * @return 組織検索結果
      */
+    //組織の検索結果の文字列を返す？
     @RequestMapping(value = "/find-orgs", method = RequestMethod.GET)
     public @ResponseBody Map<String, Object> findOrgs() {
 
