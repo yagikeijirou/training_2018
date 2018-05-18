@@ -6,9 +6,9 @@ update m_user
       ,org_cd = :orgCd
       ,manager_id = :managerId
       ,line_id = :lineId
-    </#if>
     <#if delFlg??>
       ,del_flg = :delFlg
+    </#if>
       ,update_date = :updateDate
       ,update_user_id = :updateUserId
       ,update_func_cd = :updateFuncCd

@@ -9,8 +9,8 @@ import application.entity.TLineStatus;
 import ninja.cero.sqltemplate.core.SqlTemplate;
 
 /**
- * ユーザマスタDAO。
- * @author 作成者氏名
+ * LINEステータス情報DAO。
+ * @author 菅一生
  */
 @Component
 public class TLineStatusDao extends AbstractDao<TLineStatus> {
@@ -20,20 +20,20 @@ public class TLineStatusDao extends AbstractDao<TLineStatus> {
     @Autowired
     private SqlTemplate sqlTemplate;
 
-    public Optional<TLineStatus> selectByPk(Integer userId) {
-        return Optional.ofNullable(sqlTemplate.forObject("sql/TLineStatusDao/selectByPk.sql", TLineStatus.class, userId));
+    public Optional<TLineStatus> selectByPk(String lineId) {
+        return Optional.ofNullable(sqlTemplate.forObject("sql/TLineStatusDao/selectByPk.sql", TLineStatus.class, lineId));
     }
 
     /**
-     * PKでユーザを取得する。
-     * @param userId ユーザID
-     * @return ユーザ
+     * PKでLINEステータス情報を取得する。
+     * @param lineId LINE識別子
+     * @return LINEステータス情報
      */
-    public TLineStatus getByPk(Integer userId) {
-        if (userId == null) {
+    public TLineStatus getByPk(String lineId) {
+        if (lineId == null) {
             return null;
         }
-        Optional<TLineStatus> select = selectByPk(userId);
+        Optional<TLineStatus> select = selectByPk(lineId);
         TLineStatus res = null;
         if (select.isPresent()) {
             res = select.get();
@@ -42,30 +42,22 @@ public class TLineStatusDao extends AbstractDao<TLineStatus> {
     }
 
     /**
-     * メールアドレスでユーザを取得する。
-     * @param mail
-     * @return ユーザ
+     * ユーザIDでLINEステータス情報を取得する。
+     * @param userId ユーザID
+     * @return LINEステータス情報
      */
-    public Optional<TLineStatus> selectByMail(String mail) {
-        return Optional.ofNullable(sqlTemplate.forObject("sql/TLineStatusDao/selectByMail.sql", TLineStatus.class, mail));
+    public Optional<TLineStatus> selectByUserId(Integer userId) {
+        return Optional.ofNullable(sqlTemplate.forObject("sql/TLineStatusDao/selectByUserId.sql", TLineStatus.class, userId));
     }
 
-    /**
-     * LINE IDでユーザを取得する。
-     * @param lineId LINE ID
-     * @return ユーザ
-     */
-    public Optional<TLineStatus> selectByLineId(String lineId) {
-        return Optional.ofNullable(sqlTemplate.forObject("sql/TLineStatusDao/selectByLineId.sql", TLineStatus.class, lineId));
-    }
 
     /**
-     * ユーザを取得する。
-     * @param lineId LINE識別子
-     * @return ユーザ
+     * ユーザIDでLINEステータス情報を取得する。
+     * @param userId ユーザID
+     * @return LINEステータス情報
      */
-    public TLineStatus getByLineId(String lineId) {
-        Optional<TLineStatus> select = selectByLineId(lineId);
+    public TLineStatus getByUserId(Integer userId) {
+        Optional<TLineStatus> select = selectByUserId(userId);
         TLineStatus res = null;
         if (select.isPresent()) {
             res = select.get();
@@ -74,8 +66,8 @@ public class TLineStatusDao extends AbstractDao<TLineStatus> {
     }
 
     /**
-     * ユーザを新規登録する。
-     * @param ユーザエンティティ
+     * LINEステータス情報を新規登録する。
+     * @param LINEステータス情報エンティティ
      */
     public int insert(TLineStatus entity) {
         setInsertColumns(entity);
@@ -83,20 +75,12 @@ public class TLineStatusDao extends AbstractDao<TLineStatus> {
     }
 
     /**
-     * ユーザを更新する。
-     * @param ユーザエンティティ
+     * LINEステータス情報を更新する。
+     * @param LINEステータス情報エンティティ
      */
     public int update(TLineStatus entity) {
         setUpdateColumns(entity);
         return sqlTemplate.update("sql/TLineStatusDao/update.sql", entity);
     }
 
-    /**
-     * ユーザを更新する(null値は更新対象外)。
-     * @param ユーザエンティティ
-     */
-    public int updateAsNullIsExclude(TLineStatus entity) {
-        setUpdateColumns(entity);
-        return sqlTemplate.update("sql/TLineStatusDao/updateAsNullIsExclude.sql", entity);
-    }
 }
