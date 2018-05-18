@@ -14,5 +14,9 @@ public class AttendanceListService extends AbstractAttendanceService {
     /** このクラスのロガー。 */
     private static final Logger logger = LoggerFactory.getLogger(AttendanceListService.class);
 
+    public void test() {
+    	System.out.println("chk");
+    }
+
 
 }
