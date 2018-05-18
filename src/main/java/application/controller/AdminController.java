@@ -47,6 +47,16 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping(value = "/admin")
 public class AdminController {
 
+
+	/**
+	 *
+	 * コミットルール手順作成用。
+	 * ソースを編集します。編集したとします。
+	 *
+	 */
+
+
+
     /** パスワードエンコーダー。 */
     @Autowired
     private PasswordEncoder passwordEncoder;
