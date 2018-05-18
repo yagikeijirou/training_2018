@@ -14,4 +14,9 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
     /** このクラスのロガー。 */
     private static final Logger logger = LoggerFactory.getLogger(AttendanceRewritingService.class);
 
+	public void startRewriting(String replyToken) {
+		// TODO 自動生成されたメソッド・スタブ
+
+	}
+
 }
