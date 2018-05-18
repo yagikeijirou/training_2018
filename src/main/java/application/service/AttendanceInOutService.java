@@ -11,8 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class AttendanceInOutService extends AbstractAttendanceService {
-    /** このクラスのロガー。 */
-    private static final Logger logger = LoggerFactory.getLogger(AttendanceInOutService.class);
+	/** このクラスのロガー。 */
+	private static final Logger logger = LoggerFactory.getLogger(AttendanceInOutService.class);
 
 	public void putArrivalNow(String lineId, String replyToken) {
 		// TODO 自動生成されたメソッド・スタブ
