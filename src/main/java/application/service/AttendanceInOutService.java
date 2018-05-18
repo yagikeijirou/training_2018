@@ -14,4 +14,6 @@ public class AttendanceInOutService extends AbstractAttendanceService {
     /** このクラスのロガー。 */
     private static final Logger logger = LoggerFactory.getLogger(AttendanceInOutService.class);
 
+    
+
 }
