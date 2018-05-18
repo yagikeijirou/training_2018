@@ -1,9 +1,12 @@
 package application.dao;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.google.common.base.Optional;
 
 import application.entity.TAttendance;
 import ninja.cero.sqltemplate.core.SqlTemplate;
@@ -20,21 +23,35 @@ public class TAttendanceDao extends AbstractDao<TAttendance> {
 	@Autowired
 	private SqlTemplate sqlTemplate;
 
-	public Optional<TAttendance> selectByPk(Integer userId) {
-		//TODO: return Optional.ofNullable(sqlTemplate.forObject("sql/TAttendanceDao/selectByPk.sql", TAttendance.class, userId));
-		return null;
+	/**
+	 * PKで勤怠情報を取得する。
+	 *
+	 * @param userId ユーザID
+	 * @param attendanceCd 勤怠区分コード
+	 * @param attendanceDay 出勤日
+	 * @return 勤怠情報エンティティ
+	 */
+	public Optional<TAttendance> selectByPk(Integer userId, String attendanceCd, String attendanceDay) {
+		Map<String, Object> cond = new HashMap<>();
+		cond.put("userId", userId);
+		cond.put("attendanceCd", attendanceCd);
+		cond.put("attendanceDay", attendanceDay);
+		return Optional.ofNullable(sqlTemplate.forObject("sql/TAttendanceDao/selectByPk.sql", TAttendance.class, cond));
 	}
 
 	/**
 	 * PKで勤怠情報を取得する。
+	 *
 	 * @param userId ユーザID
-	 * @return 勤怠情報
+	 * @param attendanceCd 勤怠区分コード
+	 * @param attendanceDay 出勤日
+	 * @return 勤怠情報エンティティ
 	 */
-	public TAttendance getByPk(Integer userId) {
+	public TAttendance getByPk(Integer userId, String attendanceCd, String attendanceDay) {
 		if (userId == null) {
 			return null;
 		}
-		Optional<TAttendance> select = selectByPk(userId);
+		Optional<TAttendance> select = selectByPk(userId, attendanceCd, attendanceDay);
 		TAttendance res = null;
 		if (select.isPresent()) {
 			res = select.get();
@@ -43,58 +60,33 @@ public class TAttendanceDao extends AbstractDao<TAttendance> {
 	}
 
 	/**
-	 * 勤怠区分で勤怠情報を取得する。
-	 * @param attendanceCd 勤怠区分コード
-	 * @return 勤怠情報
-	 */
-	public Optional<TAttendance> selectByAttendanceCd(String attendanceCd) {
-		//TODO: return Optional.ofNullable(sqlTemplate.forObject("sql/TAttendanceDao/selectByAttendanceCd.sql", TAttendance.class, userId));
-		return null;
-	}
-
-	/**
-	 * 勤怠区分で勤怠情報を取得する。
-	 * @param attendanceCd 勤怠区分コード
-	 * @return 勤怠情報
-	 */
-	public TAttendance getByAttendanceCd(String attendanceCd) {
-		if (attendanceCd == null) {
-			return null;
-		}
-		Optional<TAttendance> select = selectByAttendanceCd(attendanceCd);
-		TAttendance res = null;
-		if (select.isPresent()) {
-			res = select.get();
-		}
-		return res;
-	}
-
-	/**
-	 * 出勤日で勤怠情報を取得する。
+	 * ユーザID、出勤日で勤怠情報を取得する。（＝あるユーザの指定月の勤怠情報一覧）
+	 *
+	 * @param userId ユーザID
 	 * @param attendanceDay 出勤日
-	 * @return 勤怠情報
+	 * @return 勤怠情報エンティティリスト
 	 */
-	public Optional<TAttendance> selectByAttendanceDay(String attendanceDay) {
-		//TODO: return Optional.ofNullable(sqlTemplate.forObject("sql/TAttendanceDao/selectByAttendanceDay.sql", TAttendance.class, userId));
-		return null;
+	//FIXME: 現状、attendanceDayで指定した年月日のみ表示（その月全部ではない）
+	public List<TAttendance> getByUserIdAndAttendanceDay(Integer userId, String attendanceDay) {
+		Map<String, Object> cond = new HashMap<>();
+		cond.put("userId", userId);
+		cond.put("attendanceDay", attendanceDay);
+		return sqlTemplate.forList("sql/TAttendanceDao/selectByUserIdAndAttendanceDay.sql", TAttendance.class, cond);
 	}
 
 	/**
-	 * 出勤日で勤怠情報を取得する。
+	 * 出勤日で勤怠情報を取得する。（＝全ユーザの指定月の勤怠情報一覧）
+	 *
 	 * @param attendanceDay 出勤日
-	 * @return 勤怠情報
+	 * @return 勤怠情報エンティティリスト
 	 */
-	public TAttendance getByAttendanceDay(String attendanceDay) {
-		if (attendanceDay == null) {
-			return null;
-		}
-		Optional<TAttendance> select = selectByAttendanceDay(attendanceDay);
-		TAttendance res = null;
-		if (select.isPresent()) {
-			res = select.get();
-		}
-		return res;
+	//FIXME: 現状、attendanceDayで指定した年月日のみ表示（その月全部ではない）
+	public List<TAttendance> getByAttendanceDay(Integer userId, String attendanceDay) {
+		Map<String, Object> cond = new HashMap<>();
+		cond.put("attendanceDay", attendanceDay);
+		return sqlTemplate.forList("sql/TAttendanceDao/selectByAttendanceDay.sql", TAttendance.class, cond);
 	}
+
 
 	/**
 	 * 勤怠情報を新規登録する。

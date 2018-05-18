@@ -36,12 +36,12 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		int alertMode = 0;
 		// beginTimeとendTimeを受け取って、アラートを出す人数を返す
 
-		// TODO: フラグが0ならここで終了、1なら続行
+		// フラグが0ならここで終了、1なら続行
 		if (mSettingDao.get().getAlertFlag().equals("0")) {
 			return 0;
 		}
 
-		// TODO: 今がアラートを出すときではないならここで終了、出すときなら続行
+		// 今がアラートを出すときではないならここで終了、出すときなら続行
 		if ((alertMode = alertModeChecker(beginTime, endTime)) == 0) {
 			return 0;
 		}
