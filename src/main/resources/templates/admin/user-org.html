@@ -10,16 +10,14 @@
     <link rel="stylesheet" th:href="@{/lib/admin-lte/bower_components/select2/dist/css/select2.min.css}"
           href="../../static/lib/admin-lte/bower_components/select2/dist/css/bootstrap.min.css" />
 </head>
-
 <body>
-<!-- ステータスバー -->
 <div class="ui container" layout:fragment="content" th:remove="tag">
     <!-- Content Header (Page header) -->
     <section class="content-header">
     </section>
-</div>
 
-<!-- 管理画面 -->
+
+</div>
 <div layout:fragment="script" th:remove="tag">
     <!-- Select2 -->
     <script src="../../static/lib/admin-lte/bower_components/select2/dist/js/select2.min.js"
@@ -30,34 +28,6 @@
     <script th:src="@{/js/admin/user-org.js}"
             src="../../static/js/admin/user-org.js"></script>
 
-    <!-- 組織表示の基本的なパーツ -->
-    <script id="org-list-head" type="text/x-jsrender">
-		<tr>
-			<th>
-				組織管理
-			</th>
-		</tr>
-		<tr>
-			<td>
-				<a class="btn btn-xs btn-info" onclick="openUpdateOrg('{{:orgCd}}')" href="#">
-                    <i class="fa fa-pencil"></i>
-			</td>
-		</tr>
-		<tr class="clickable" onclick="findUser('{{:orgCd}}')">
-            <td class="vert-align col-md-4">
-                {{:orgCd}}
-            </td>
-            <td class="vert-align col-md-8">
-                {{:orgName}}
-            </td>
-        </tr>
-    </script>
-    
-    <!-- 実際に組織が登録されていく部分 -->
-    <script id="org-list-" type="text/x-jsrender">
-    </script>
-    
-    <!-- idに'org-record-tmpl'を指定するとここを呼び出せる -->
     <script id="org-record-tmpl" type="text/x-jsrender">
         <tr class="clickable" onclick="findUser('{{:orgCd}}')">
             <td class="vert-align col-md-4">

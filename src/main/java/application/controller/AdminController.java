@@ -118,7 +118,6 @@ public class AdminController {
 
     /**
      * ユーザ・組織管理画面表示.
-     * @author 黄倉大輔
      *
      * @return ユーザ・組織管理画面
      */
@@ -129,21 +128,18 @@ public class AdminController {
 
     /**
      * 組織検索を実行する。
-     * @author 黄倉大輔
      *
      * @return 組織検索結果
      */
+    //組織の検索結果の文字列を返す？
     @RequestMapping(value = "/find-orgs", method = RequestMethod.GET)
     public @ResponseBody Map<String, Object> findOrgs() {
-//    	//すべての組織情報を検索する
-//    	MOrg mOrg = orgService.getOrg;
 
         return null;
     }
 
     /**
      * 組織を取得する。
-     * @author 黄倉大輔
      * @param orgCd 組織コード
      * @return 組織情報
      */
@@ -156,7 +152,6 @@ public class AdminController {
 
     /**
      * ユーザ検索を実行する。
-     * @author 黄倉大輔
      *
      * @return ユーザ検索結果
      */
@@ -168,7 +163,6 @@ public class AdminController {
 
     /**
      * ユーザを取得する。
-     * @author 黄倉大輔
      * @param userId ユーザID
      * @return 組織情報
      */
@@ -225,28 +219,19 @@ public class AdminController {
 
     /**
      * 組織を登録する。
-     * @author 黄倉大輔
      * @param orgForm 組織フォーム
      * @param bindingResult バインド結果
      * @return 登録結果
      */
-    //元々引数にbindingResultが設定されていなかったが、ミスと判断し追加した
     @RequestMapping(value = "/orgs", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> registerOrg(@Valid @ModelAttribute OrgForm orgForm,
-            BindingResult bindingResult) {
-    	//フォームをMOrgエンティティにマッピング
-//    	MOrg mOrg = modelMapper.map(orgForm, MOrg.class);
-//    	//エンティティをDBに登録
-//    	orgService.registerOrg(mOrg);
-//        //バリデーション結果をView側に返却(エラーが出たとき'status'==NG)
-//    	return genValidationErrorResponse(bindingResult);
-    	return null;
+    public ResponseEntity<Map<String, Object>> registerOrg(OrgForm orgForm) {
+
+        return null;
     }
 
     /**
      * 組織を更新する。
-     * @author 黄倉大輔
      * @param orgForm 組織フォーム
      * @param bindingResult バインド結果
      * @return 更新結果
@@ -261,7 +246,6 @@ public class AdminController {
 
     /**
      * 組織を削除する。
-     * @author 黄倉大輔
      * @param orgCd 組織コード
      * @return 削除結果
      */
@@ -274,7 +258,6 @@ public class AdminController {
 
     /**
      * ユーザを登録する。
-     * @author 黄倉大輔
      * @param userForm ユーザフォーム
      * @param bindingResult バインド結果
      * @return ユーザ登録結果
@@ -289,7 +272,6 @@ public class AdminController {
 
     /**
      * ユーザを更新する。
-     * @author 黄倉大輔
      * @param userForm ユーザフォーム
      * @param bindingResult バインド結果
      * @return 更新結果
@@ -306,7 +288,6 @@ public class AdminController {
 
     /**
      * ユーザを削除する。
-     * @author 黄倉大輔
      * @param userIds ユーザID
      * @return 削除結果
      */
@@ -320,7 +301,6 @@ public class AdminController {
 
     /**
      * 組織選択Select2データソースを取得する。
-     * @author 黄倉大輔
      * @param q 組織名検索ワード
      * @return 組織選択Select2データソース
      */
@@ -332,7 +312,6 @@ public class AdminController {
 
     /**
      * ユーザ選択Select2データソースを取得する。
-     * @author 黄倉大輔
      * @param orgCd 組織コード
      * @param name ユーザ名検索ワード
      * @return ユーザ選択Select2データソース
@@ -346,7 +325,6 @@ public class AdminController {
 
     /**
      * 権限選択Select2データソースを取得する。
-     * @author 黄倉大輔
      * @return 権限選択Select2データソース
      */
     @RequestMapping(value = "/auths/select2", method = RequestMethod.GET)

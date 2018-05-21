@@ -21,8 +21,8 @@ function findOrg() {
               if(res.results.length > 0) {
                   var tmpl = $.templates('#org-record-tmpl');
 
-                  $.each(res.results, function(index, record){//findOrgsから返された、組織情報の配列をorg-listタグ内に登録していく..?
-                     $('#org-list').append(tmpl.render(record))//org-record-tmplのテンプレートをもとに、org-listにappendしていく
+                  $.each(res.results, function(index, record){
+                     $('#org-list').append(tmpl.render(record))
                   });
 
               } else {
@@ -106,11 +106,11 @@ function registerOrg() {
           data: $form.serialize()
           }).done(function(res) {
               removeLoading(formId);
-        	  if (res.status == 'NG') {//registerOrgの戻り値が'NG'だったら
+        	  if (res.status == 'NG') {
         		  showInfoMessage(res.message);
         	  } else {
                   showInfoMessage("登録しました");
-    	          findOrg();//更新した表を表示
+    	          findOrg();
                   $('#modal-org-form').modal('hide');
         	  }
           }).fail(function(XMLHttpRequest, textStatus, errorThrown) {
@@ -369,16 +369,13 @@ function onUserAllSelecting() {
 $(function() {
 	function format(item) { return item.text; };
 
-    //組織を表示
-	findOrg();
+    findOrg();
 
-    //組織をクリックすると、所属するユーザが表示される
-	$('#org-list > tr').click(function() {
+    $('#org-list > tr').click(function() {
         findUser($(this).data("org-cd"));
     });
 
-    //???
-	$('.modal').on('hidden.bs.modal', function(event) {
+    $('.modal').on('hidden.bs.modal', function(event) {
         $(event.target).find('form')[0].reset();
         $(event.target).find('select').val('').trigger('change');
     });
