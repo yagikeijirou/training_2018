@@ -1,5 +1,8 @@
 package application.dao;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +31,7 @@ public class TAttendanceDao extends AbstractDao<TAttendance> {
 	 *
 	 * @param userId ユーザID
 	 * @param attendanceCd 勤怠区分コード
-	 * @param attendanceDay 出勤日
+	 * @param attendanceDay 出勤日（yyyyMMdd）
 	 * @return 勤怠情報エンティティ
 	 */
 	public Optional<TAttendance> selectByPk(Integer userId, String attendanceCd, String attendanceDay) {
@@ -44,7 +47,7 @@ public class TAttendanceDao extends AbstractDao<TAttendance> {
 	 *
 	 * @param userId ユーザID
 	 * @param attendanceCd 勤怠区分コード
-	 * @param attendanceDay 出勤日
+	 * @param attendanceDay 出勤日（yyyyMMdd）
 	 * @return 勤怠情報エンティティ
 	 */
 	public TAttendance getByPk(Integer userId, String attendanceCd, String attendanceDay) {
@@ -66,13 +69,22 @@ public class TAttendanceDao extends AbstractDao<TAttendance> {
 	 * @param attendanceMonth 出勤年月（yyyyMM）
 	 * @return 勤怠情報エンティティリスト
 	 */
-	//TODO: 引数を年月にして、その月のリストが出るように修正。
 	public List<TAttendance> getByUserIdAndAttendanceMonth(Integer userId, String attendanceMonth) {
-		String date1;
-		String date2;
+		Date aMonth;
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");
+		System.out.println(attendanceMonth);
+
+		try {
+			aMonth = sdf.parse(attendanceMonth);
+		} catch (ParseException e) {
+			e.printStackTrace();
+			aMonth = null;
+		}
+
+		System.out.println("userId: " + userId + "\r\naMonth: " + new SimpleDateFormat("yyyyMMdd").format(aMonth));
 		Map<String, Object> cond = new HashMap<>();
 		cond.put("userId", userId);
-		cond.put("attendanceDay", attendanceMonth);
+		cond.put("aMonth", new SimpleDateFormat("yyyyMMdd").format(aMonth));
 		return sqlTemplate.forList("sql/TAttendanceDao/selectByUserIdAndAttendanceMonth.sql", TAttendance.class, cond);
 	}
 
@@ -82,13 +94,23 @@ public class TAttendanceDao extends AbstractDao<TAttendance> {
 	 * @param attendanceMonth 出勤年月（yyyyMM）
 	 * @return 勤怠情報エンティティリスト
 	 */
-	//TODO: 引数を年月にして、その月のリストが出るように修正。
-	public List<TAttendance> getByAttendanceMonth(Integer userId, String attendanceMonth) {
+	public List<TAttendance> getByAttendanceMonth(String attendanceMonth) {
+		Date aMonth;
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");
+		System.out.println(attendanceMonth);
+
+		try {
+			aMonth = sdf.parse(attendanceMonth);
+		} catch (ParseException e) {
+			e.printStackTrace();
+			aMonth = null;
+		}
+
+		System.out.println("aMonth: " + new SimpleDateFormat("yyyyMMdd").format(aMonth));
 		Map<String, Object> cond = new HashMap<>();
-		cond.put("attendanceDay", attendanceMonth);
+		cond.put("aMonth", new SimpleDateFormat("yyyyMMdd").format(aMonth));
 		return sqlTemplate.forList("sql/TAttendanceDao/selectByAttendanceMonth.sql", TAttendance.class, cond);
 	}
-
 
 	/**
 	 * 勤怠情報を新規登録する。
