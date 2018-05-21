@@ -142,6 +142,10 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		return 0;
 	}
 
+	/**
+	 * 菅テスト用メソッド
+	 * @author 菅一生
+	 */
 	private void tests() {
 		logger.debug("tests()");
 		int userId = 201618;
@@ -152,14 +156,14 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		//List<TAttendance> ta = tAttendanceDao.getByUserIdAndAttendanceMonth(userId, attendanceMonth);
 		List<TAttendance> ta = tAttendanceDao.getByAttendanceMonth(attendanceMonth);
 
-		System.out.println("--ANSER BELOW----------------------------------------");
+		System.out.println("--ANSWER BELOW----------------------------------------");
 		//System.out.println(ta);
 
 		for (TAttendance result : ta) {
 			System.out.println(result);
 		}
 
-		System.out.println("--ANSER ABOVE----------------------------------------");
+		System.out.println("--ANSWER ABOVE----------------------------------------");
 	}
 
 	private void hodaka() {
