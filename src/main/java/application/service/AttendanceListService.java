@@ -1,5 +1,6 @@
 package application.service;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -78,25 +79,33 @@ public class AttendanceListService extends AbstractAttendanceService {
 			cal.set(Calendar.MONTH, Integer.parseInt(text.split("/")[1]));
 			int lastDayOfMonth = cal.getActualMaximum(Calendar.DATE);
 
+			SimpleDateFormat sdf1 = new SimpleDateFormat("E");
+			SimpleDateFormat sdf2 = new SimpleDateFormat("hh:mm");
+
+
 			TAttendance tattendance;
 			for (int i = 1; i <= lastDayOfMonth; i++) {
+				//出勤レコード
+				tattendance = tattendanceDao.getByPk(user.getUserId(), "01", text + "/" + i);
 				msg.append(text.split("/")[1]);
 				msg.append("/");
 				msg.append(String.valueOf(i));
 				msg.append("(");
+				msg.append(sdf1.format(tattendance.getAttendanceTime()));
 				//曜日
 				msg.append(")");
-				tattendance = tattendanceDao.getByPk(user.getUserId(), "01", text + "/" + i);
+
 				if(tattendance.getEditFlg() == "1") {
 					editFlg = true;
 				}
-				msg.append(tattendance.getAttendanceTime());
+				msg.append(sdf2.format(tattendance.getAttendanceTime()));
 				msg.append("～");
+				//退勤レコード
 				tattendance = tattendanceDao.getByPk(user.getUserId(), "02", text + "/" + i);
 				if(tattendance.getEditFlg() == "1") {
 					editFlg = true;
 				}
-				msg.append(tattendance.getAttendanceTime());
+				msg.append(sdf2.format(tattendance.getAttendanceTime()));
 				if(editFlg) {
 					msg.append("修正");
 				}
@@ -104,10 +113,10 @@ public class AttendanceListService extends AbstractAttendanceService {
 			}
 
 			//LINEステータス更新
-            lineStatus.setMenuCd("empty");
-            lineStatus.setActionName(null);
-            lineStatus.setContents(text);
-            tLineStatusDao.save(lineStatus);
+			lineStatus.setMenuCd("empty");
+			lineStatus.setActionName(null);
+			lineStatus.setContents(text);
+			tLineStatusDao.save(lineStatus);
 
 			//メッセージの送信
 			LineAPIService.repryMessage(replyToken, msg.toString());
