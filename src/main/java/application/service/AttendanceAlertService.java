@@ -65,14 +65,17 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 	 * @return アラートを出した人数
 	 */
 	public int pushAlerts(Date beginTime, Date endTime) {
-		logger.debug("pushAlerts()");
-
-		// テスト用
+		// テスト用、最後に削除すること。
 		tests();
 		hodaka();
 
+		logger.debug("pushAlerts()");
+
 		/** アラートモード（1：出勤打刻防止、2：退勤打刻防止、0：アラート不要）**/
 		int alertMode = 0;
+
+		/** アラートを出した人の数 **/
+		int alertCounter = 0;
 
 		// フラグが0ならここで終了、1なら続行
 		if (mSettingDao.get().getAlertFlag().equals("0")) {
@@ -85,8 +88,16 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		}
 
 		// TODO: アラートを出し、出した人数をカウント
+		while (true) {
+			//if mode = 1
+			//出勤プッシュメソッド
+			//if mode = 2
+			//退勤プッシュメソッド
+			break;
+		}
 
-		return 0;
+		System.err.println("Hello");
+		return alertCounter;
 	}
 
 	/**
@@ -122,7 +133,7 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		System.out.println(CommonUtils.parseDate(CommonUtils.toYyyyMmDd() + openTime + openMinutes, "yyyyMMddHHmm"));
 		System.out.println(CommonUtils.parseDate(CommonUtils.toYyyyMmDd() + closeTime + closeMinutes, "yyyyMMddHHmm"));
 		System.out.println("----------------------------");
-		**/
+		 **/
 
 		// cron時刻範囲が出勤打刻漏れ防止アラート設定時刻を含むとき、return 1
 		if (openDate.after(beginTime) && openDate.before(endTime)) {
@@ -135,8 +146,18 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		}
 
 		// cron時刻範囲が打刻漏れ防止アラート設定時刻外のとき、return 0
-		return 0;
+		return 1;
+		// return 0; 上はテスト用、最終的に正しいのはこれ
 	}
+
+	/**
+	 * 出勤プッシュメソッド
+	 */
+
+	/**
+	 * 退勤プッシュメソッド
+	 */
+
 
 	/**
 	 * 菅テスト用メソッド
@@ -160,6 +181,7 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		}
 
 		System.out.println("--ANSWER ABOVE----------------------------------------");
+
 	}
 
 	private void hodaka() {
