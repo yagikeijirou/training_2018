@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import application.entity.TLineStatus;
+
 /**
  * 勤怠情報「修正」操作サービス。
  */
@@ -15,6 +17,11 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
     private static final Logger logger = LoggerFactory.getLogger(AttendanceRewritingService.class);
 
 	public void startRewriting(String replyToken) {
+		// TODO 自動生成されたメソッド・スタブ
+
+	}
+
+	public void editAction(String lineId, String replyToken, TLineStatus lineStatus, String text) {
 		// TODO 自動生成されたメソッド・スタブ
 
 	}
