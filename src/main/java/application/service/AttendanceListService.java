@@ -38,9 +38,6 @@ public class AttendanceListService extends AbstractAttendanceService {
     @Autowired
     TLineStatusDao tLineStatusDao;
 
-	@Autowired
-	StringBuilder msg;
-
 	/**
 	 * リッチメニューから「リスト」が選択された時の処理。
 	 * @param replyToken リプライトークン
@@ -69,6 +66,7 @@ public class AttendanceListService extends AbstractAttendanceService {
 		boolean editFlg = false;
 
 		//一般・上司・管理者チェック
+		StringBuilder msg = new StringBuilder();
 		if (user.getAuthCd().equals("1")) {
 			//一般の場合
 			//勤怠情報検索
