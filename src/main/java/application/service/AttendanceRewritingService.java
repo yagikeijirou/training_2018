@@ -5,8 +5,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import application.entity.TLineStatus;
+
 /**
  * 勤怠情報「修正」操作サービス。
+ * @author 須永寛紀
  */
 @Service
 @Transactional
@@ -18,6 +21,9 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 		// TODO 自動生成されたメソッド・スタブ
 
 		//1,LINEステータス情報を検索する。
+		TLineStatus t_line_status = new TLineStatus();
+		System.out.println("id: " + t_line_status.getLineId());
+
 
 		//2,メニューコードとアクション名が適切か確認する。
 
