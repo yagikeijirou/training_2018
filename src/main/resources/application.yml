@@ -9,7 +9,8 @@ logging:
         org.springframework.jdbc.core.JdbcTemplate: DEBUG
 spring:
     datasource:
-        url: jdbc:oracle:thin:ATT_USER/att_user@//192.168.56.101:1521/ORCL
+        #url: jdbc:oracle:thin:ATT_USER/att_user@//192.168.56.101:1521/ORCL
+        url: jdbc:oracle:thin:hoshiba/hoshiba123@//192.168.201.162:1521/xe
         driverClassName: oracle.jdbc.driver.OracleDriver
     messages:
         encoding: UTF-8
@@ -32,10 +33,10 @@ security:
         enabled: false
 line:
     bot:
-        lineAtId: '@tzx0024e'
-        channelToken: CpEwxhSF6sg7nmW/zYIOWtn1+lgi9Z3hTRBklV4OKE3VeGoFu9tYFCK2sge0154lkQrGDGrCBI2aJdvJw8SDOGF6Js7FzQ7e+cpeRP4/FXIm6KnEva69Tf0/WhgfWAzCg6CO1wOkn7joIpN/qOAb7wdB04t89/1O/w1cDnyilFU=
-        channelSecret: 121bbab79100494e60c5fdafe4944e7f
+        lineAtId: '@bas5059g'
+        channelToken: ceQYzuzXOA2f90kt5zsLbLmH63qkUIzCGFKtD3uO+xLTVbQ0EK0FGAcPEbUGTZHu5TFZeehbLk856w6e5dM7xMMgsNhUhAR5B5dHkdNuzB5uvQxa00f/CrbAZ6dVhrAinvZFo9CYgjmfwmLnTIc8cwdB04t89/1O/w1cDnyilFU=
+        channelSecret: 9df7977a2e78a2f1c37c6f75cc3a47ac
     linelogin:
-        channelId: 1577690414
-        channelSecret: 92975b2d664057e142f8ca314f217d0a
+        channelId: 1580083022
+        channelSecret: cf252d9be2092c53ee45ac9906586250
         callbackUrl: https://32ea86a3.ngrok.io/user/auth
