@@ -89,4 +89,9 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 
 	}
 
+	public void editAction(String lineId, String replyToken, TLineStatus lineStatus, String text) {
+		// TODO 自動生成されたメソッド・スタブ
+
+	}
+
 }

@@ -105,7 +105,7 @@ public class AttendanceMenuService extends AbstractAttendanceService {
         } else {
             switch (menuCd) {
             case REWRITING:
-//                attendanceRewritingService.editAction(lineId, replyToken, lineStatus, text);
+                attendanceRewritingService.editAction(lineId, replyToken, lineStatus, text);
                 break;
             case LIST_OUTPUT:
                 attendanceListService.listAction(lineId, replyToken, lineStatus, text);

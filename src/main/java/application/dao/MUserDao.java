@@ -1,5 +1,8 @@
 package application.dao;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +63,7 @@ public class MUserDao extends AbstractDao<MUser> {
     }
 
     /**
-     * ユーザを取得する。
+     * LINE IDでユーザを取得する。
      * @param lineId LINE識別子
      * @return ユーザ
      */
@@ -71,6 +74,19 @@ public class MUserDao extends AbstractDao<MUser> {
             res = select.get();
         }
         return res;
+    }
+
+    /**
+     * 上司IDでユーザを取得する。
+     *
+     * @param managerId ユーザID
+     * @return ユーザエンティティリスト
+     * @author 隅田穂高
+     */
+    public List<MUser> getByManagerId(int managerId) {
+        Map<String, Object> cond = new HashMap<>();
+        cond.put("managerId", managerId);
+        return sqlTemplate.forList("sql/MUser/getByManagerId.sql", MUser.class, cond);
     }
 
     /**
