@@ -1,31 +1,78 @@
 <!DOCTYPE html>
 <html lang="jp" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorator="adminLayout">
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="adminLayout">
 <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <meta charset="utf-8"/>
-    <link rel="stylesheet" type="text/css" th:href="@{/lib/admin-lte/plugins/timepicker/bootstrap-timepicker.min.css}"
-          href="../../static/lib/admin-lte/plugins/timepicker/bootstrap-timepicker.min.css"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="utf-8" />
+<link rel="stylesheet" type="text/css"
+	th:href="@{/lib/admin-lte/plugins/timepicker/bootstrap-timepicker.min.css}"
+	href="../../static/lib/admin-lte/plugins/timepicker/bootstrap-timepicker.min.css" />
 </head>
+<head>
+<script type="text/javascript">
+	function pDate() {
+		alert('foo');
+	}
+	/*var btn = document.getElementById('year-montht');
+	btn.addEventListener('load', function(e) {
+		alert('foo');
+	}, false);
+
+	document.getElementId('year-montht').onload = function() {
+
+		var ND, YY, MM, outData;
+
+		ND = new Date();
+
+		YY = ND.getFullYear();
+		MM = ND.getMonth() + 1;
+
+		//document.myFORM.date.value = m + "月" + d + "日";
+		return m + "月" + d + "日";
+	}*/
+</script>
+</head>
+
+
 <body>
-<div class="ui container" layout:fragment="content" th:remove="tag">
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
-    </section>
+	<div class="ui container" layout:fragment="content" th:remove="tag">
+		<!-- Content Header (Page header) -->
+		<section class="content-header"></section>
 
+		<!-- Main content -->
+		<section class="content">
+			<div class="box box-default">
+				<form id="listOutput-form" class="form-horizontal" action="#"
+					th:action="@{/admin/ListOutput}" th:object="${listOutputForm}"
+					method="GET">
+					<div class="box-header with-border">
+						<h3 class="box-title">リスト出力</h3>
+					</div>
 
-</div>
-<div layout:fragment="script" th:remove="tag">
-    <script th:src="@{/js/admin/listOutput.js}"
-            src="../../static/js/admin/listOutput.js"></script>
+					<input id="yearMonthPicker" type="month"
+						class="form-control date" onLoad="pDate()" name="myFORM"
+						required="required" />
+				</form>
+				<div class="pull-right">
+					<button type="button" name="action" value="confirm" form = "listOutput-form"
+						class="btn btn-primary" onclick="confirmBeforeSubmit('listOutput-form', '出力しますか？')">出力</button>
+				</div>
+			</div>
+		</section>
+	</div>
+	<div layout:fragment="script" th:remove="tag">
+		<script th:src="@{/js/admin/listOutput.js}"
+			src="../../static/js/admin/listOutput.js"></script>
 
-    <script th:src="@{/lib/admin-lte/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js}"
-            src="../../static/lib/admin-lte/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+		<script
+			th:src="@{/lib/admin-lte/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js}"
+			src="../../static/lib/admin-lte/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
 
-    <script th:src="@{/lib/admin-lte/bower_components/bootstrap-datepicker/dist/locales/bootstrap-datepicker.ja.min.js}"
-            src="../../static/lib/admin-lte/bower_components/bootstrap-datepicker/dist/locales/bootstrap-datepicker.ja.min.js"></script>
-</div>
+		<script
+			th:src="@{/lib/admin-lte/bower_components/bootstrap-datepicker/dist/locales/bootstrap-datepicker.ja.min.js}"
+			src="../../static/lib/admin-lte/bower_components/bootstrap-datepicker/dist/locales/bootstrap-datepicker.ja.min.js"></script>
+	</div>
 </body>
 </html>

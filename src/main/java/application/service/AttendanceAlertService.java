@@ -43,8 +43,6 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 	@Autowired
 	private TAttendanceDao tAttendanceDao;
 
-
-
 	/////
 
 	@Autowired
@@ -53,13 +51,11 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 	@Autowired
 	TAttendanceDao tattendanceDao;
 
-    /** LINEステータス情報DAO。 */
-    @Autowired
-    TLineStatusDao tLineStatusDao;
+	/** LINEステータス情報DAO。 */
+	@Autowired
+	TLineStatusDao tLineStatusDao;
 
-
-    /////
-
+	/////
 
 	/**
 	 * ある時間範囲に、打刻漏れ防止アラートを出すよう設定された時刻が含まれていた場合、アラートを出すメソッド。
@@ -195,11 +191,11 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		TLineStatus lineStatus = null;
 		String text = "2018/03";
 
-
 		//入力値チェック(yyyy/mmかどうか、テンプレートメッセージかどうか)
 		//ユーザマスタ検索
 		MUser user = muserDao.getByLineId(lineId);
 		System.out.println(user.getName());
+		System.out.println(user.getUserId());
 
 		//修正フラグ
 		boolean editFlg = false;
@@ -208,7 +204,7 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		StringBuilder msg = new StringBuilder();
 		//if (user.getAuthCd().equals("1")) {
 		System.out.println("if_before");
-		if(true) {
+		if (true) {
 			//一般の場合
 			//勤怠情報検索
 			//List<TAttendance> tattendance = tattendanceDao.getByAttendanceMonth(user.getUserId(), text);
@@ -222,59 +218,96 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 			SimpleDateFormat sdf1 = new SimpleDateFormat("E");
 			SimpleDateFormat sdf2 = new SimpleDateFormat("hh:mm");
 
-			TAttendance tattendance;
+			TAttendance arrival_t, clock_out_t;
 			for (int i = 1; i <= lastDayOfMonth; i++) {
-				//出勤レコード
-				tattendance = tattendanceDao.getByPk(user.getUserId(), "01", text + "/" + i);
+
+				arrival_t = tattendanceDao.getByPk(user.getUserId(), "01", text.replace("/", "") + i);
+				clock_out_t = tattendanceDao.getByPk(user.getUserId(), "02", text.replace("/", "") + i);
 				msg.append(text.split("/")[1]);
 				msg.append("/");
 				msg.append(String.valueOf(i));
 				msg.append("(");
-				msg.append(sdf1.format(tattendance.getAttendanceTime()));
+				cal.set(Calendar.DATE, i);
+				msg.append(sdf1.format(cal.getTime()));
 				//曜日
-				msg.append(")");
+				msg.append(") ");
 
-				if (tattendance.getEditFlg() == "1") {
-					editFlg = true;
-				}
-				msg.append(sdf2.format(tattendance.getAttendanceTime()));
-				msg.append("～");
-				//退勤レコード
-				tattendance = tattendanceDao.getByPk(user.getUserId(), "02", text + "/" + i);
-				if (tattendance.getEditFlg() == "1") {
-					editFlg = true;
-				}
-				msg.append(sdf2.format(tattendance.getAttendanceTime()));
-				if (editFlg) {
-					msg.append("修正");
+				if (arrival_t != null && clock_out_t != null) {
+					//出勤レコード
+					if (arrival_t.getEditFlg() == "1") {
+						editFlg = true;
+					}
+					msg.append(sdf2.format(arrival_t.getAttendanceTime()));
+					msg.append("～");
+
+					//退勤レコード
+					if (clock_out_t.getEditFlg() == "1") {
+						editFlg = true;
+					}
+					msg.append(sdf2.format(clock_out_t.getAttendanceTime()));
+					if (editFlg) {
+						msg.append("修正");
+					}
+				} else if (arrival_t != null) {//出勤レコードのみ
+					if (arrival_t.getEditFlg() == "1") {
+						editFlg = true;
+					}
+					msg.append(sdf2.format(arrival_t.getAttendanceTime()));
+					msg.append("～");
+				} else if (clock_out_t != null) {//退勤レコードのみ
+					msg.append("～");
+					if (clock_out_t.getEditFlg() == "1") {
+						editFlg = true;
+					}
+					msg.append(sdf2.format(clock_out_t.getAttendanceTime()));
+				} else {
+
+					msg.append("---");
 				}
 				msg.append(System.getProperty("line.separator"));
 			}
+			System.out.println(msg.toString());
 
 			//LINEステータス更新
+			lineStatus = getLineSutatus(lineId);
 			lineStatus.setMenuCd("empty");
 			lineStatus.setActionName(null);
 			lineStatus.setContents(text);
 			tLineStatusDao.save(lineStatus);
 
 			//メッセージの送信
-			LineAPIService.repryMessage(replyToken, msg.toString());
-			System.out.println(msg.toString());
+			//LineAPIService.repryMessage(replyToken, msg.toString());
 		} else {
-//			//上司・管理者の場合
-//			//部下情報検索
-//			List<MUser> junior = muserDao.getByManagerId(user.getUserId());
-//
-//			//テンプレートメッセージ作成
-//			List<String> msgList = new ArrayList<String>();
-//			for (MUser mu : junior) {
-//				msgList.add(mu.getName());
-//			}
-//
-//			//テンプレートメッセージ送信
-//			LineAPIService.pushButtons(lineId, AppMesssageSource.getMessage("line.selectMenu"), msgList);
+			//			//上司・管理者の場合
+			//			//部下情報検索
+			//			List<MUser> junior = muserDao.getByManagerId(user.getUserId());
+			//
+			//			//テンプレートメッセージ作成
+			//			List<String> msgList = new ArrayList<String>();
+			//			for (MUser mu : junior) {
+			//				msgList.add(mu.getName());
+			//			}
+			//
+			//			//テンプレートメッセージ送信
+			//			LineAPIService.pushButtons(lineId, AppMesssageSource.getMessage("line.selectMenu"), msgList);
 		}
 
 	}
+
+	/**
+     * 前回のLINE操作を取得する。
+     * @param lineId 送信元LINE識別子
+     * @return LINEステータス。存在しない場合、初期値をセットした新規行
+     */
+    private TLineStatus getLineSutatus(String lineId) {
+        TLineStatus res = tLineStatusDao.getByPk(lineId);
+        if (res == null) {
+            res = new TLineStatus();
+            res.setLineId(lineId);
+            MUser user = mUserDao.getByLineId(lineId);
+            res.setUserId(user.getUserId());
+        }
+        return res;
+    }
 
 }

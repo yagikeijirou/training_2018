@@ -68,10 +68,11 @@ public class AttendanceListService extends AbstractAttendanceService {
 
 		//一般・上司・管理者チェック
 		StringBuilder msg = new StringBuilder();
-		if (user.getAuthCd().equals("1")) {
+		//if (user.getAuthCd().equals("01")) {
+		if (user.getAuthCd().equals("01") || (lineStatus!=null && lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION))) {
 			//一般の場合
 			//勤怠情報検索
-			//List<TAttendance> tattendance = tattendanceDao.getByAttendanceMonth(user.getUserId(), text);
+//			List<TAttendance> tattendance = tattendanceDao.getByAttendanceMonth(user.getUserId(), text);
 
 			//メッセージ作成(mm/dd(D) hh:mm ~ hh:mm #{"修正"}||#{""})
 			Calendar cal = Calendar.getInstance();
@@ -82,35 +83,55 @@ public class AttendanceListService extends AbstractAttendanceService {
 			SimpleDateFormat sdf1 = new SimpleDateFormat("E");
 			SimpleDateFormat sdf2 = new SimpleDateFormat("hh:mm");
 
-
-			TAttendance tattendance;
+			TAttendance arrival_t, clock_out_t;
 			for (int i = 1; i <= lastDayOfMonth; i++) {
-				//出勤レコード
-				tattendance = tattendanceDao.getByPk(user.getUserId(), "01", text + "/" + i);
+
+				arrival_t = tattendanceDao.getByPk(user.getUserId(), "01", text.replace("/", "") + i);
+				clock_out_t = tattendanceDao.getByPk(user.getUserId(), "02", text.replace("/", "") + i);
 				msg.append(text.split("/")[1]);
 				msg.append("/");
 				msg.append(String.valueOf(i));
 				msg.append("(");
-				msg.append(sdf1.format(tattendance.getAttendanceTime()));
+				cal.set(Calendar.DATE, i);
+				msg.append(sdf1.format(cal.getTime()));
 				//曜日
-				msg.append(")");
+				msg.append(") ");
 
-				if(tattendance.getEditFlg() == "1") {
-					editFlg = true;
-				}
-				msg.append(sdf2.format(tattendance.getAttendanceTime()));
-				msg.append("～");
-				//退勤レコード
-				tattendance = tattendanceDao.getByPk(user.getUserId(), "02", text + "/" + i);
-				if(tattendance.getEditFlg() == "1") {
-					editFlg = true;
-				}
-				msg.append(sdf2.format(tattendance.getAttendanceTime()));
-				if(editFlg) {
-					msg.append("修正");
+				if (arrival_t != null && clock_out_t != null) {
+					//出勤レコード
+					if (arrival_t.getEditFlg() == "1") {
+						editFlg = true;
+					}
+					msg.append(sdf2.format(arrival_t.getAttendanceTime()));
+					msg.append("～");
+
+					//退勤レコード
+					if (clock_out_t.getEditFlg() == "1") {
+						editFlg = true;
+					}
+					msg.append(sdf2.format(clock_out_t.getAttendanceTime()));
+					if (editFlg) {
+						msg.append("修正");
+					}
+				} else if (arrival_t != null) {//出勤レコードのみ
+					if (arrival_t.getEditFlg() == "1") {
+						editFlg = true;
+					}
+					msg.append(sdf2.format(arrival_t.getAttendanceTime()));
+					msg.append("～");
+				} else if (clock_out_t != null) {//退勤レコードのみ
+					msg.append("～");
+					if (clock_out_t.getEditFlg() == "1") {
+						editFlg = true;
+					}
+					msg.append(sdf2.format(clock_out_t.getAttendanceTime()));
+				} else {
+
+					msg.append("---");
 				}
 				msg.append(System.getProperty("line.separator"));
 			}
+			System.out.println(msg.toString());
 
 			//LINEステータス更新
 			lineStatus.setMenuCd("empty");
@@ -133,7 +154,7 @@ public class AttendanceListService extends AbstractAttendanceService {
 
 			//テンプレートメッセージ送信
 			LineAPIService.pushButtons(lineId, AppMesssageSource.getMessage("line.selectMenu"), msgList);
-		}
 
+		}
 	}
 }
