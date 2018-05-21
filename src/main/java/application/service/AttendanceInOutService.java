@@ -64,14 +64,14 @@ public class AttendanceInOutService extends AbstractAttendanceService {
 				String msg = AppMesssageSource.getMessage("line.arrival");
 				LineAPIService.repryMessage(replyToken, msg);
 
-				System.out.println("登録できました");
+				System.out.println("登録できました。");
 
 			} else {
 				/*エラーメッセージ表示する*/
 				String msg = AppMesssageSource.getMessage("line.api.err.savedArrival");
 				LineAPIService.repryMessage(replyToken, msg);
 
-				System.out.println("登録できませんでした");
+				System.out.println("登録できませんでした。");
 			}
 		}
 	}
@@ -118,14 +118,14 @@ public class AttendanceInOutService extends AbstractAttendanceService {
 				String msg = AppMesssageSource.getMessage("line.clockOut");
 				LineAPIService.repryMessage(replyToken, msg);
 
-				System.out.println("登録できました");
+				System.out.println("登録できました。");
 
 			} else {
 				/*退勤時刻登録しない*/
 				String msg = AppMesssageSource.getMessage("line.api.err.savedClockOut");
 				LineAPIService.repryMessage(replyToken, msg);
 
-				System.out.println("登録できませんでした");
+				System.out.println("登録できませんでした。");
 			}
 		}
 	}
