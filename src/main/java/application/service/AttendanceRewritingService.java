@@ -2,13 +2,17 @@ package application.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import application.context.AppMesssageSource;
+import application.dao.TLineStatusDao;
 import application.entity.TLineStatus;
 
 /**
  * 勤怠情報「修正」操作サービス。
+ * @author 須永寛紀
  */
 @Service
 @Transactional
@@ -16,10 +20,33 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
     /** このクラスのロガー。 */
     private static final Logger logger = LoggerFactory.getLogger(AttendanceRewritingService.class);
 
+
+	/** LINEステータス情報DAO。 */
+	@Autowired
+	private TLineStatusDao tLineStatusDao;
+
+	/**
+	 * LINEステータス情報を検索する。
+	 *
+	 * @param
+	 * @return
+	 */
+    public void sarchLineStatus() {
+    	TLineStatus t_line_status = new TLineStatus();
+
+
+		t_line_status = tLineStatusDao.getByPk("2849846");
+
+    }
+
 	public void startRewriting(String replyToken) {
 		// TODO 自動生成されたメソッド・スタブ
 
+		String msg = AppMesssageSource.getMessage("line.selectMenu");
+        LineAPIService.repryMessage(replyToken, msg);
+
 		//1,LINEステータス情報を検索する。
+
 
 		//2,メニューコードとアクション名が適切か確認する。
 

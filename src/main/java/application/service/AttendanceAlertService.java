@@ -1,6 +1,7 @@
 package application.service;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -43,8 +44,6 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 	@Autowired
 	private TAttendanceDao tAttendanceDao;
 
-
-
 	/////
 
 	@Autowired
@@ -53,13 +52,11 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 	@Autowired
 	TAttendanceDao tattendanceDao;
 
-    /** LINEステータス情報DAO。 */
-    @Autowired
-    TLineStatusDao tLineStatusDao;
+	/** LINEステータス情報DAO。 */
+	@Autowired
+	TLineStatusDao tLineStatusDao;
 
-
-    /////
-
+	/////
 
 	/**
 	 * ある時間範囲に、打刻漏れ防止アラートを出すよう設定された時刻が含まれていた場合、アラートを出すメソッド。
@@ -69,14 +66,17 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 	 * @return アラートを出した人数
 	 */
 	public int pushAlerts(Date beginTime, Date endTime) {
-		logger.debug("pushAlerts()");
-
-		// テスト用
+		// テスト用、最後に削除すること。
 		tests();
 		hodaka();
 
+		logger.debug("pushAlerts()");
+
 		/** アラートモード（1：出勤打刻防止、2：退勤打刻防止、0：アラート不要）**/
 		int alertMode = 0;
+
+		/** アラートを出した人の数 **/
+		int alertCounter = 0;
 
 		// フラグが0ならここで終了、1なら続行
 		if (mSettingDao.get().getAlertFlag().equals("0")) {
@@ -89,8 +89,16 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		}
 
 		// TODO: アラートを出し、出した人数をカウント
+		while (true) {
+			//if mode = 1
+			//出勤プッシュメソッド
+			//if mode = 2
+			//退勤プッシュメソッド
+			break;
+		}
 
-		return 0;
+		System.err.println("Hello");
+		return alertCounter;
 	}
 
 	/**
@@ -126,7 +134,7 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		System.out.println(CommonUtils.parseDate(CommonUtils.toYyyyMmDd() + openTime + openMinutes, "yyyyMMddHHmm"));
 		System.out.println(CommonUtils.parseDate(CommonUtils.toYyyyMmDd() + closeTime + closeMinutes, "yyyyMMddHHmm"));
 		System.out.println("----------------------------");
-		**/
+		 **/
 
 		// cron時刻範囲が出勤打刻漏れ防止アラート設定時刻を含むとき、return 1
 		if (openDate.after(beginTime) && openDate.before(endTime)) {
@@ -139,8 +147,17 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		}
 
 		// cron時刻範囲が打刻漏れ防止アラート設定時刻外のとき、return 0
-		return 0;
+		return 1;
+		// return 0; 上はテスト用、最終的に正しいのはこれ
 	}
+
+	/**
+	 * 出勤プッシュメソッド
+	 */
+
+	/**
+	 * 退勤プッシュメソッド
+	 */
 
 	/**
 	 * 菅テスト用メソッド
@@ -164,6 +181,7 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		}
 
 		System.out.println("--ANSWER ABOVE----------------------------------------");
+
 	}
 
 	private void hodaka() {
@@ -173,23 +191,21 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		TLineStatus lineStatus = null;
 		String text = "2018/03";
 
-
 		//入力値チェック(yyyy/mmかどうか、テンプレートメッセージかどうか)
 		//ユーザマスタ検索
 		MUser user = muserDao.getByLineId(lineId);
-		System.out.println(user.getName());
+		//		System.out.println(user.getName());
+		//		System.out.println(user.getUserId());
 
 		//修正フラグ
-		boolean editFlg = false;
+		boolean editFlg;
 
 		//一般・上司・管理者チェック
 		StringBuilder msg = new StringBuilder();
-		//if (user.getAuthCd().equals("1")) {
-		System.out.println("if_before");
-		if(true) {
+		if (user.getAuthCd().equals("02") || (lineStatus!=null && lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION))) {
 			//一般の場合
 			//勤怠情報検索
-			//List<TAttendance> tattendance = tattendanceDao.getByAttendanceMonth(user.getUserId(), text);
+			//			List<TAttendance> tattendance = tattendanceDao.getByAttendanceMonth(user.getUserId(), text);
 
 			//メッセージ作成(mm/dd(D) hh:mm ~ hh:mm #{"修正"}||#{""})
 			Calendar cal = Calendar.getInstance();
@@ -200,57 +216,97 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 			SimpleDateFormat sdf1 = new SimpleDateFormat("E");
 			SimpleDateFormat sdf2 = new SimpleDateFormat("hh:mm");
 
-			TAttendance tattendance;
+			TAttendance arrival_t, clock_out_t;
 			for (int i = 1; i <= lastDayOfMonth; i++) {
-				//出勤レコード
-				tattendance = tattendanceDao.getByPk(user.getUserId(), "01", text + "/" + i);
+				editFlg = false;
+
+				arrival_t = tattendanceDao.getByPk(user.getUserId(), "01", text.replace("/", "") + i);
+				clock_out_t = tattendanceDao.getByPk(user.getUserId(), "02", text.replace("/", "") + i);
 				msg.append(text.split("/")[1]);
 				msg.append("/");
 				msg.append(String.valueOf(i));
 				msg.append("(");
-				msg.append(sdf1.format(tattendance.getAttendanceTime()));
+				cal.set(Calendar.DATE, i);
+				msg.append(sdf1.format(cal.getTime()));
 				//曜日
-				msg.append(")");
+				msg.append(") ");
 
-				if (tattendance.getEditFlg() == "1") {
-					editFlg = true;
-				}
-				msg.append(sdf2.format(tattendance.getAttendanceTime()));
-				msg.append("～");
-				//退勤レコード
-				tattendance = tattendanceDao.getByPk(user.getUserId(), "02", text + "/" + i);
-				if (tattendance.getEditFlg() == "1") {
-					editFlg = true;
-				}
-				msg.append(sdf2.format(tattendance.getAttendanceTime()));
-				if (editFlg) {
-					msg.append("修正");
+				if (arrival_t != null && clock_out_t != null) {
+					//出勤レコード
+					if (arrival_t.getEditFlg().equals("1")) {
+						editFlg = true;
+					}
+					msg.append(sdf2.format(arrival_t.getAttendanceTime()));
+					msg.append("～");
+
+					//退勤レコード
+					if (clock_out_t.getEditFlg().equals("1")) {
+						editFlg = true;
+					}
+					msg.append(sdf2.format(clock_out_t.getAttendanceTime()));
+					if (editFlg) {
+						msg.append("修正");
+					}
+				} else if (arrival_t != null) {//出勤レコードのみ
+					if (arrival_t.getEditFlg().equals("1")) {
+						editFlg = true;
+					}
+					msg.append(sdf2.format(arrival_t.getAttendanceTime()));
+					msg.append("～");
+				} else if (clock_out_t != null) {//退勤レコードのみ
+					msg.append("～");
+					if (clock_out_t.getEditFlg().equals("1")) {
+						editFlg = true;
+					}
+					msg.append(sdf2.format(clock_out_t.getAttendanceTime()));
+				} else {
+
+					msg.append("---");
 				}
 				msg.append(System.getProperty("line.separator"));
 			}
+			System.out.println(msg.toString());
 
 			//LINEステータス更新
-			lineStatus.setMenuCd("empty");
-			lineStatus.setActionName(null);
-			lineStatus.setContents(text);
-			tLineStatusDao.save(lineStatus);
+//			lineStatus = getLineSutatus(lineId);
+//			lineStatus.setMenuCd("empty");
+//			lineStatus.setActionName(null);
+//			lineStatus.setContents(text);
+//			tLineStatusDao.save(lineStatus);
 
 			//メッセージの送信
-			LineAPIService.repryMessage(replyToken, msg.toString());
-			System.out.println(msg.toString());
+			//LineAPIService.repryMessage(replyToken, msg.toString());
 		} else {
-//			//上司・管理者の場合
-//			//部下情報検索
-//			List<MUser> junior = muserDao.getByManagerId(user.getUserId());
-//
-//			//テンプレートメッセージ作成
-//			List<String> msgList = new ArrayList<String>();
-//			for (MUser mu : junior) {
-//				msgList.add(mu.getName());
-//			}
-//
-//			//テンプレートメッセージ送信
-//			LineAPIService.pushButtons(lineId, AppMesssageSource.getMessage("line.selectMenu"), msgList);
+			//上司・管理者の場合
+			//部下情報検索
+			List<MUser> junior = muserDao.getByManagerId(new Integer(200911));
+
+			//テンプレートメッセージ作成
+			List<String> msgList = new ArrayList<String>();
+			msgList.add("自分");
+
+			if (msgList != null) {
+				for (MUser mu : junior) {
+					msgList.add(mu.getName());
+				}
+			}
+
+			for (String str : msgList) {
+				System.out.println("-----------------------------");
+				System.out.println(str);
+				System.out.println("-----------------------------");
+			}
+
+			//LINEステータス更新
+//			lineStatus = getLineSutatus(lineId);
+//			lineStatus.setMenuCd("03");
+//			lineStatus.setActionName(ACTION_LIST_USER_SELECTION);
+//			lineStatus.setContents(text);
+//			tLineStatusDao.save(lineStatus);
+
+			//テンプレートメッセージ送信
+//			LineAPIService.pushButtons(lineId, AppMesssageSource.getMessage("line.selectUserByList"), msgList);
+
 		}
 
 	}
