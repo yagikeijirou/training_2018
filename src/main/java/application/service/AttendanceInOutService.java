@@ -26,6 +26,9 @@ public class AttendanceInOutService extends AbstractAttendanceService {
 	@Autowired
 	MUserDao mUserDao;
 
+	@Autowired
+	TLineStatusDao tLineStatusDao;
+
 	/**出勤ボタンが押された場合の処理*/
 	public void putArrivalNow(String lineId, String replyToken) {
 
@@ -39,7 +42,7 @@ public class AttendanceInOutService extends AbstractAttendanceService {
 
 
 		/*取得したLINE識別子からLINEステータスを取得*/
-		TLineStatusDao tLineStatusDao = new TLineStatusDao();
+		//TLineStatusDao tLineStatusDao = new TLineStatusDao();
 		TLineStatus tLineStatus = tLineStatusDao.getByPk(lineId);
 
 		/*LINEステータスからリクエスト時刻を取得*/
@@ -93,7 +96,7 @@ public class AttendanceInOutService extends AbstractAttendanceService {
 
 
 		/*取得したLINE識別子からLINEステータスを取得*/
-		TLineStatusDao tLineStatusDao = new TLineStatusDao();
+		//TLineStatusDao tLineStatusDao = new TLineStatusDao();
 		TLineStatus tLineStatus = tLineStatusDao.getByPk(lineId);
 
 		/*LINEステータスからリクエスト時刻を取得*/

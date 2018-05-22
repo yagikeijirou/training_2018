@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import application.context.AppMesssageSource;
 import application.dao.MSettingDao;
 import application.dao.MUserDao;
 import application.dao.TAttendanceDao;
@@ -351,6 +352,57 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 	private void kashiwara() {
 		logger.debug("kashiwara()");
 
+		String lineId = "U242fce147b05106f3d5f31e7b82c7747";
+		String replyToken = "";
+
+		/*取得したLINE識別子からユーザを取得*/
+		//MUserDao mUserDao = new MUserDao();
+		MUser mUser = mUserDao.getByLineId(lineId);
+
+		/*取得したユーザのユーザIDを取得*/
+		//mUser.getUserId();
+
+
+		/*取得したLINE識別子からLINEステータスを取得*/
+		//TLineStatusDao tLineStatusDao = new TLineStatusDao();
+		TLineStatus tLineStatus = tLineStatusDao.getByPk(lineId);
+
+		/*LINEステータスからリクエスト時刻を取得*/
+		//linestatus.getRequestTime();
+
+
+		TAttendance tAttendance = new TAttendance();
+
+		/*勤怠情報からユーザIDを取得*/
+		//tA.getUserId();
+
+		/*勤怠情報から勤怠時刻を取得*/
+		//tA.getAttendanceTime();
+
+
+		/*ユーザマスタのユーザIDと勤怠情報のユーザIDが一致するレコードを検索*/
+		if (tAttendance.getUserId() == mUser.getUserId()) {
+
+			/*勤怠情報の勤怠時刻に既に出勤打刻が登録されていないか確認*/
+			if ((tAttendance.getAttendanceTime() == null) && (tAttendance.getAttendanceCd() == "02")) {
+
+				/*リクエスト時刻を退勤時刻として登録する*/
+				tAttendance.setAttendanceTime(tLineStatus.getRequestTime()) ;
+
+				/*メッセージをLINEアプリ上で表示させて処理を終了する*/
+				String msg = AppMesssageSource.getMessage("line.clockOut");
+				LineAPIService.repryMessage(replyToken, msg);
+
+				System.out.println("登録できました");
+
+			} else {
+				/*退勤時刻登録しないでエラーメッセージ表示する*/
+				String msg = AppMesssageSource.getMessage("line.api.err.savedClockOut");
+				LineAPIService.repryMessage(replyToken, msg);
+
+				System.out.println("登録できませんでした。");
+			}
+		}
 
 
 	}
