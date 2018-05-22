@@ -1,5 +1,8 @@
 package application.service;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,13 +33,18 @@ public class OrgService {
     }
 
     /**
-     * 全組織を取得する。
+     * 全組織を取得し、マップに変換する。
      *
-     * @return ユーザ情報
+     * @return ユーザ情報リスト
      */
-    public Optional<MOrg> getOrg() {
-        return Optional.ofNullable(morgDao.getAll());
-    }
+    public Map<String, Object> getOrg() {
+    	List<MOrg> mOrgs = morgDao.getAll();
+		Map<String, Object> map = new HashMap<>();
+		for(MOrg mo : mOrgs) {
+			map.put(mo.getOrgCd(), mo.getOrgName());
+		}
+		return map;
+	}
 
     /**
      * 組織を登録する。
