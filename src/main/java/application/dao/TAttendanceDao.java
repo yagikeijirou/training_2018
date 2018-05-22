@@ -72,7 +72,6 @@ public class TAttendanceDao extends AbstractDao<TAttendance> {
 	public List<TAttendance> getByUserIdAndAttendanceMonth(Integer userId, String attendanceMonth) {
 		Date aMonth;
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");
-		System.out.println(attendanceMonth);
 
 		try {
 			aMonth = sdf.parse(attendanceMonth);
@@ -81,7 +80,6 @@ public class TAttendanceDao extends AbstractDao<TAttendance> {
 			aMonth = null;
 		}
 
-		System.out.println("userId: " + userId + "\r\naMonth: " + new SimpleDateFormat("yyyyMMdd").format(aMonth));
 		Map<String, Object> cond = new HashMap<>();
 		cond.put("userId", userId);
 		cond.put("aMonth", new SimpleDateFormat("yyyyMMdd").format(aMonth));
@@ -97,7 +95,6 @@ public class TAttendanceDao extends AbstractDao<TAttendance> {
 	public List<TAttendance> getByAttendanceMonth(String attendanceMonth) {
 		Date aMonth;
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");
-		System.out.println(attendanceMonth);
 
 		try {
 			aMonth = sdf.parse(attendanceMonth);
@@ -106,10 +103,41 @@ public class TAttendanceDao extends AbstractDao<TAttendance> {
 			aMonth = null;
 		}
 
-		System.out.println("aMonth: " + new SimpleDateFormat("yyyyMMdd").format(aMonth));
 		Map<String, Object> cond = new HashMap<>();
 		cond.put("aMonth", new SimpleDateFormat("yyyyMMdd").format(aMonth));
 		return sqlTemplate.forList("sql/TAttendanceDao/selectByAttendanceMonth.sql", TAttendance.class, cond);
+	}
+
+	/**
+	 * 指定ユーザの最新の勤怠情報を取得する。
+	 *
+	 * @param userId ユーザID
+	 * @return 勤怠情報エンティティ
+	 * @author 菅一生
+	 */
+	public Optional<TAttendance> selectLatestOneByUserId(Integer userId) {
+		Map<String, Object> cond = new HashMap<>();
+		cond.put("userId", userId);
+		return Optional.ofNullable(sqlTemplate.forObject("sql/TAttendanceDao/selectLatestOneByUserId.sql", TAttendance.class, cond));
+	}
+
+	/**
+	 * 指定ユーザの最新の勤怠情報を取得する。
+	 *
+	 * @param userId ユーザID
+	 * @return 勤怠情報エンティティ
+	 * @author 菅一生
+	 */
+	public TAttendance getLatestOneByUserId(Integer userId) {
+		if (userId == null) {
+			return null;
+		}
+		Optional<TAttendance> select = selectLatestOneByUserId(userId);
+		TAttendance res = null;
+		if (select.isPresent()) {
+			res = select.get();
+		}
+		return res;
 	}
 
 	/**

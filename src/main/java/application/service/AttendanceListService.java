@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,7 @@ import application.dao.TLineStatusDao;
 import application.entity.MUser;
 import application.entity.TAttendance;
 import application.entity.TLineStatus;
+import application.utils.CommonUtils;
 
 /**
  * 勤怠情報「リスト」操作サービス。
@@ -29,15 +31,17 @@ public class AttendanceListService extends AbstractAttendanceService {
 	/** このクラスのロガー。 */
 	private static final Logger logger = LoggerFactory.getLogger(AttendanceListService.class);
 
+	/** 勤怠情報DAO。 */
 	@Autowired
-	MUserDao muserDao;
+	private TAttendanceDao tAttendanceDao;
 
+	/** LINEステータス情報DAO。 */
 	@Autowired
-	TAttendanceDao tattendanceDao;
+	private TLineStatusDao tLineStatusDao;
 
-    /** LINEステータス情報DAO。 */
-    @Autowired
-    TLineStatusDao tLineStatusDao;
+	/** ユーザマスタDAO。 */
+	@Autowired
+	private MUserDao mUserDao;
 
 	/**
 	 * リッチメニューから「リスト」が選択された時の処理。
@@ -59,79 +63,92 @@ public class AttendanceListService extends AbstractAttendanceService {
 	 */
 	public void listAction(String lineId, String replyToken, TLineStatus lineStatus, String text) {
 
-		//入力値チェック(yyyy/mmかどうか、テンプレートメッセージかどうか)
 		//ユーザマスタ検索
-		MUser user = muserDao.getByLineId(lineId);
+		MUser user = null;
+		String ym = null;
+
+		//年月入力？
+		if (Pattern.compile("^[0-9]{4}/[01]*[0-9]").matcher(text).find()) {
+			user = mUserDao.getByLineId(lineId);
+			ym = text;
+
+		//リスト選択？
+		} else if (lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION)) {
+			user = mUserDao.getByName(text);
+			ym = lineStatus.getActionName();
+		}
+
+		if (user == null) {
+			LineAPIService.repryMessage(replyToken, AppMesssageSource.getMessage("line.api.err.userNotExists"));
+			return;
+		}
 
 		//修正フラグ
 		boolean editFlg = false;
 
 		//一般・上司・管理者チェック
 		StringBuilder msg = new StringBuilder();
-		//if (user.getAuthCd().equals("01")) {
-		if (user.getAuthCd().equals("01") || (lineStatus!=null && lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION))) {
-			//一般の場合
-			//勤怠情報検索
-//			List<TAttendance> tattendance = tattendanceDao.getByAttendanceMonth(user.getUserId(), text);
 
-			//メッセージ作成(mm/dd(D) hh:mm ~ hh:mm #{"修正"}||#{""})
+		if (user.getAuthCd().equals("01") || lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION)) {
+			//勤怠情報表示
+
+			//カレンダー
 			Calendar cal = Calendar.getInstance();
-			cal.set(Calendar.YEAR, Integer.parseInt(text.split("/")[0]));
-			cal.set(Calendar.MONTH, Integer.parseInt(text.split("/")[1]));
+			cal.set(Calendar.YEAR, Integer.parseInt(ym.split("/")[0]));
+			cal.set(Calendar.MONTH, Integer.parseInt(ym.split("/")[1]));
 			int lastDayOfMonth = cal.getActualMaximum(Calendar.DATE);
 
-			SimpleDateFormat sdf1 = new SimpleDateFormat("E");
-			SimpleDateFormat sdf2 = new SimpleDateFormat("hh:mm");
+			//時刻フォーマット
+			SimpleDateFormat sdf = new SimpleDateFormat("hh:mm");
 
+			//出勤、退勤情報
 			TAttendance arrival_t, clock_out_t;
-			for (int i = 1; i <= lastDayOfMonth; i++) {
 
-				arrival_t = tattendanceDao.getByPk(user.getUserId(), "01", text.replace("/", "") + i);
-				clock_out_t = tattendanceDao.getByPk(user.getUserId(), "02", text.replace("/", "") + i);
-				msg.append(text.split("/")[1]);
+			//メッセージ作成(mm/dd(D) hh:mm ~ hh:mm #{"修正"}||#{""})
+			for (int i = 1; i <= lastDayOfMonth; i++) {
+				editFlg = false;
+
+				arrival_t = tAttendanceDao.getByPk(user.getUserId(), "01",
+						CommonUtils.toYearMonth(ym) + String.format("%02d", i));
+				clock_out_t = tAttendanceDao.getByPk(user.getUserId(), "02",
+						CommonUtils.toYearMonth(ym) + String.format("%02d", i));
+				msg.append(String.format("%02d", Integer.parseInt(ym.split("/")[1])));
 				msg.append("/");
-				msg.append(String.valueOf(i));
+				msg.append(String.format("%02d", i));
 				msg.append("(");
 				cal.set(Calendar.DATE, i);
-				msg.append(sdf1.format(cal.getTime()));
-				//曜日
+				msg.append(new SimpleDateFormat("E").format(cal.getTime()));
 				msg.append(") ");
 
 				if (arrival_t != null && clock_out_t != null) {
 					//出勤レコード
-					if (arrival_t.getEditFlg() == "1") {
-						editFlg = true;
-					}
-					msg.append(sdf2.format(arrival_t.getAttendanceTime()));
+					msg.append(sdf.format(arrival_t.getAttendanceTime()));
 					msg.append("～");
-
 					//退勤レコード
-					if (clock_out_t.getEditFlg() == "1") {
+					msg.append(sdf.format(clock_out_t.getAttendanceTime()));
+					if ((arrival_t.getEditFlg().equals("1")) || (clock_out_t.getEditFlg().equals("1"))) {
 						editFlg = true;
-					}
-					msg.append(sdf2.format(clock_out_t.getAttendanceTime()));
-					if (editFlg) {
-						msg.append("修正");
 					}
 				} else if (arrival_t != null) {//出勤レコードのみ
-					if (arrival_t.getEditFlg() == "1") {
+					msg.append(sdf.format(arrival_t.getAttendanceTime()));
+					msg.append("～");
+					if (arrival_t.getEditFlg().equals("1")) {
 						editFlg = true;
 					}
-					msg.append(sdf2.format(arrival_t.getAttendanceTime()));
-					msg.append("～");
 				} else if (clock_out_t != null) {//退勤レコードのみ
 					msg.append("～");
-					if (clock_out_t.getEditFlg() == "1") {
+					msg.append(sdf.format(clock_out_t.getAttendanceTime()));
+					if (clock_out_t.getEditFlg().equals("1")) {
 						editFlg = true;
 					}
-					msg.append(sdf2.format(clock_out_t.getAttendanceTime()));
 				} else {
-
 					msg.append("---");
+				}
+				if (editFlg) {
+					msg.append(" 修正");
 				}
 				msg.append(System.getProperty("line.separator"));
 			}
-			System.out.println(msg.toString());
 
 			//LINEステータス更新
 			lineStatus.setMenuCd("empty");
@@ -144,13 +161,19 @@ public class AttendanceListService extends AbstractAttendanceService {
 		} else {
 			//上司・管理者の場合
 			//部下情報検索
-			List<MUser> junior = muserDao.getByManagerId(user.getUserId());
+			List<MUser> junior = mUserDao.getByManagerId(user.getUserId());
 
 			//テンプレートメッセージ作成
 			List<String> msgList = new ArrayList<String>();
 			for (MUser mu : junior) {
 				msgList.add(mu.getName());
 			}
+
+			//LINEステータス更新
+			lineStatus.setMenuCd("03");
+			lineStatus.setActionName(ACTION_LIST_USER_SELECTION);
+			lineStatus.setContents(text);
+			tLineStatusDao.save(lineStatus);
 
 			//テンプレートメッセージ送信
 			LineAPIService.pushButtons(lineId, AppMesssageSource.getMessage("line.selectMenu"), msgList);
