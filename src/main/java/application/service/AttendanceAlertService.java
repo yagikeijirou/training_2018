@@ -77,6 +77,9 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		/** アラートを出した人の数 **/
 		int alertCounter = 0;
 
+		/** ユーザマスタの全ユーザのエンティティリスト **/
+		List<MUser> mu = mUserDao.getAll();
+
 		// フラグが0ならここで終了、1なら続行
 		if (mSettingDao.get().getAlertFlag().equals("0")) {
 			return 0;
@@ -89,11 +92,19 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 
 		// TODO: アラートを出し、出した人数をカウント
 
-		/**
-		for (MUser result : mu) {
-			System.out.println(result.getUserId());
+		for (MUser eachUser : mu) {
+			switch (eachUser.getUserId()) {
+			case 1:
+
+				break;
+			case 2:
+				break;
+
+			default:
+				break;
+			}
+			System.out.println(eachUser.getUserId());
 		}
-		**/
 
 		while (true) {
 			//if mode = 1
