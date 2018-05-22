@@ -10,7 +10,7 @@ import ninja.cero.sqltemplate.core.SqlTemplate;
 
 /**
  * 組織マスタDAO。
- * @author 隅田穂高
+ * @author 隅田穂高(追記編集：黄倉大輔)
  */
 @Component
 public class MOrgDao extends AbstractDao<MOrg> {
@@ -20,8 +20,13 @@ public class MOrgDao extends AbstractDao<MOrg> {
     @Autowired
     private SqlTemplate sqlTemplate;
 
-    public Optional<MOrg> selectByPk(Integer orgId) {
-        return Optional.ofNullable(sqlTemplate.forObject("sql/MOrgDao/selectByPk.sql", MOrg.class, orgId));
+    /**
+     * PKで組織情報を取得する
+     * @param orgCd 組織コード
+     * @return 組織エンティティ
+     */
+    public Optional<MOrg> selectByPk(String orgCd) {
+        return Optional.ofNullable(sqlTemplate.forObject("sql/MOrgDao/selectByPk.sql", MOrg.class, orgCd));
     }
 
     /**
@@ -30,7 +35,7 @@ public class MOrgDao extends AbstractDao<MOrg> {
      * @return 組織エンティティ
      */
     public Optional<MOrg> select() {
-        return Optional.ofNullable(sqlTemplate.forObject("sql/MOrgDao/select.sql", MOrg.class));
+        return Optional.ofNullable(sqlTemplate.forObject("sql/MOrgDao/selectAll.sql", MOrg.class));
     }
 
 
@@ -49,14 +54,14 @@ public class MOrgDao extends AbstractDao<MOrg> {
 
     /**
      * PKで組織を取得する。
-     * @param orgId 組織ID
+     * @param orgCd 組織コード
      * @return 組織
      */
-    public MOrg getByPk(Integer orgId) {
-        if (orgId == null) {
+    public MOrg getByPk(String orgCd) {
+        if (orgCd == null) {
             return null;
         }
-        Optional<MOrg> select = selectByPk(orgId);
+        Optional<MOrg> select = selectByPk(orgCd);
         MOrg res = null;
         if (select.isPresent()) {
             res = select.get();

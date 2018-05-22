@@ -13,7 +13,7 @@ import ninja.cero.sqltemplate.core.SqlTemplate;
 
 /**
  * ユーザマスタDAO。
- * @author 作成者氏名
+ * @author 黄倉大輔(一部編集)
  */
 @Component
 public class MUserDao extends AbstractDao<MUser> {
@@ -23,6 +23,11 @@ public class MUserDao extends AbstractDao<MUser> {
     @Autowired
     private SqlTemplate sqlTemplate;
 
+    /**
+     * PKでユーザ情報を取得する
+     * @param userId ユーザID
+     * @return ユーザエンティティ
+     */
     public Optional<MUser> selectByPk(Integer userId) {
         return Optional.ofNullable(sqlTemplate.forObject("sql/MUserDao/selectByPk.sql", MUser.class, userId));
     }

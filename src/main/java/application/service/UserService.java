@@ -13,6 +13,7 @@ import application.entity.MUser;
 
 /**
  * ユーザ情報操作サービスクラス。
+ * @author 黄倉大輔(一部編集)
  */
 @Service
 @Transactional
@@ -76,5 +77,32 @@ public class UserService {
             return false;
         }
         return true;
+    }
+
+    /**
+     * ユーザを登録する。
+     * @param mUser ユーザマスタエンティティ
+     * @author 黄倉大輔
+     */
+    public void registerUser(MUser mUser) {
+        muserDao.insert(mUser);
+    }
+
+    /**
+     * ユーザを更新する。
+     * @param mUser ユーザマスタエンティティ
+     * @author 黄倉大輔
+     */
+    public void updateUser(MUser mUser) {
+        muserDao.updateAsNullIsExclude(mUser);
+    }
+
+    /**
+     * ユーザを削除する。
+     * @param mUser ユーザマスタエンティティ
+     * @author 黄倉大輔
+     */
+    public void deleteUser(MUser mUser) {
+        muserDao.delete(mUser);
     }
 }
