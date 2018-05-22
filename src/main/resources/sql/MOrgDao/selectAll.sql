@@ -1,3 +1,3 @@
 SELECT *
   FROM m_org
-  ORDER BY dispSeq
+  ORDER BY disp_seq

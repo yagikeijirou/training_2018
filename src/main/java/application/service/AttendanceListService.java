@@ -74,7 +74,7 @@ public class AttendanceListService extends AbstractAttendanceService {
 
 		//リスト選択？
 		} else if (lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION)) {
-			user = mUserDao.getByName(text);
+			user = mUserDao.getByPk(Integer.parseInt(text.split(" ")[0]));
 			ym = lineStatus.getActionName();
 		}
 
@@ -150,6 +150,9 @@ public class AttendanceListService extends AbstractAttendanceService {
 				msg.append(System.getProperty("line.separator"));
 			}
 
+			//単体テスト用
+			System.out.println(msg.toString());
+
 			//LINEステータス更新
 			lineStatus.setMenuCd("empty");
 			lineStatus.setActionName(null);
@@ -157,7 +160,7 @@ public class AttendanceListService extends AbstractAttendanceService {
 			tLineStatusDao.save(lineStatus);
 
 			//メッセージの送信
-			LineAPIService.repryMessage(replyToken, msg.toString());
+			//LineAPIService.repryMessage(replyToken, msg.toString());
 		} else {
 			//上司・管理者の場合
 			//部下情報検索
@@ -166,6 +169,8 @@ public class AttendanceListService extends AbstractAttendanceService {
 			//テンプレートメッセージ作成
 			List<String> msgList = new ArrayList<String>();
 			for (MUser mu : junior) {
+				msgList.add(mu.getUserId().toString());
+				msgList.add(" ");
 				msgList.add(mu.getName());
 			}
 
@@ -176,7 +181,7 @@ public class AttendanceListService extends AbstractAttendanceService {
 			tLineStatusDao.save(lineStatus);
 
 			//テンプレートメッセージ送信
-			LineAPIService.pushButtons(lineId, AppMesssageSource.getMessage("line.selectMenu"), msgList);
+			//LineAPIService.pushButtons(lineId, AppMesssageSource.getMessage("line.selectMenu"), msgList);
 
 		}
 	}

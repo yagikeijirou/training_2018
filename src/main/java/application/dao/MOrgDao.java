@@ -1,5 +1,6 @@
 package application.dao;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,13 +44,9 @@ public class MOrgDao extends AbstractDao<MOrg> {
      * 全組織を取得する
      * @param 組織エンティティ
      */
-    public MOrg getAll() {
-         Optional<MOrg> select = select();
-         MOrg res = null;
-         if (select.isPresent()) {
-             res = select.get();
-         }
-         return res;
+    public List<MOrg> getAll() {
+
+         return sqlTemplate.forList("sql/MOrgDao/selectAll.sql", MOrg.class);
     }
 
     /**
