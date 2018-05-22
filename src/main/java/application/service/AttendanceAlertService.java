@@ -337,23 +337,4 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 
 	}
 
-<<<<<<< HEAD
-=======
-	/**
-	 * 前回のLINE操作を取得する。
-	 * @param lineId 送信元LINE識別子
-	 * @return LINEステータス。存在しない場合、初期値をセットした新規行
-	 */
-	private TLineStatus getLineSutatus(String lineId) {
-		TLineStatus res = tLineStatusDao.getByPk(lineId);
-		if (res == null) {
-			res = new TLineStatus();
-			res.setLineId(lineId);
-			MUser user = mUserDao.getByLineId(lineId);
-			res.setUserId(user.getUserId());
-		}
-		return res;
-	}
-
->>>>>>> refs/remotes/origin/master
 }

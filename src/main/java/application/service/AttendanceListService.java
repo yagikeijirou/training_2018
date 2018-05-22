@@ -65,11 +65,11 @@ public class AttendanceListService extends AbstractAttendanceService {
 
 		//入力値チェック(yyyy/mmかどうか、テンプレートメッセージかどうか)
 		//ユーザマスタ検索
-		MUser user;
+		MUser user = null;
 		if (Pattern.compile("^[0-9]{4}/[01]?[0-9]").matcher(text).find()) {
 			user = muserDao.getByLineId(lineId);
 		} else if(lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION)){
-			user = muserDao.getByUserName(lineId);
+			user = muserDao.getByName(lineId);
 		}
 
 		if (user == null) {
