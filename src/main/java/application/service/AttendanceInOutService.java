@@ -67,7 +67,7 @@ public class AttendanceInOutService extends AbstractAttendanceService {
 				System.out.println("登録できました");
 
 			} else {
-				/*エラーメッセージ表示する*/
+				/*出勤時刻登録しないでエラーメッセージ表示する*/
 				String msg = AppMesssageSource.getMessage("line.api.err.savedArrival");
 				LineAPIService.repryMessage(replyToken, msg);
 
@@ -121,7 +121,7 @@ public class AttendanceInOutService extends AbstractAttendanceService {
 				System.out.println("登録できました");
 
 			} else {
-				/*退勤時刻登録しない*/
+				/*退勤時刻登録しないでエラーメッセージ表示する*/
 				String msg = AppMesssageSource.getMessage("line.api.err.savedClockOut");
 				LineAPIService.repryMessage(replyToken, msg);
 
