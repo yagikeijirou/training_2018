@@ -113,6 +113,38 @@ public class TAttendanceDao extends AbstractDao<TAttendance> {
 	}
 
 	/**
+	 * 指定ユーザの最新の勤怠情報を取得する。
+	 *
+	 * @param userId ユーザID
+	 * @return 勤怠情報エンティティ
+	 * @author 菅一生
+	 */
+	public Optional<TAttendance> selectLatestOneByUserId(Integer userId) {
+		Map<String, Object> cond = new HashMap<>();
+		cond.put("userId", userId);
+		return Optional.ofNullable(sqlTemplate.forObject("sql/TAttendanceDao/selectLatestOneByUserId.sql", TAttendance.class, cond));
+	}
+
+	/**
+	 * 指定ユーザの最新の勤怠情報を取得する。
+	 *
+	 * @param userId ユーザID
+	 * @return 勤怠情報エンティティ
+	 * @author 菅一生
+	 */
+	public TAttendance getLatestOneByUserId(Integer userId) {
+		if (userId == null) {
+			return null;
+		}
+		Optional<TAttendance> select = selectLatestOneByUserId(userId);
+		TAttendance res = null;
+		if (select.isPresent()) {
+			res = select.get();
+		}
+		return res;
+	}
+
+	/**
 	 * 勤怠情報を新規登録する。
 	 * @param 勤怠情報エンティティ
 	 */
