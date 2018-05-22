@@ -74,6 +74,8 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 
 		logger.debug("pushAlerts()");
 
+		/** アラートモード（1：出勤打刻防止、2：退勤打刻防止、0：アラート不要）**/
+		int alertMode = 0;
 		/** アラートを出した人の数 **/
 		int alertCounter = 0;
 		/** ユーザマスタの全ユーザのエンティティリスト **/
@@ -87,7 +89,7 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		}
 
 		// 今がアラートを出すときではないならここで終了、出すときなら続行
-		if ((alertModeChecker(beginTime, endTime)) == 0) {
+		if ((alertMode = alertModeChecker(beginTime, endTime)) == 0) {
 			return 0;
 		}
 
@@ -100,19 +102,12 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 				continue;
 			}
 
-			switch (tmpTa.getAttendanceCd()) {
-			case "01":
-				// 最新勤怠情報が出勤 -> 退勤漏れ -> 退勤打刻漏れ防止アラート
-				//LineAPIService.pushMessage(eachUser.getLineId(), AppMesssageSource.getMessage("line.alertNotFoundAttendance", "退勤"));
-				break;
-
-			case "02":
+			if (alertMode == 1 && (tmpTa.getAttendanceCd().equals("02"))) {
 				// 最新勤怠情報が退勤 -> 出勤漏れ -> 出勤打刻漏れ防止アラート
 				//LineAPIService.pushMessage(eachUser.getLineId(), AppMesssageSource.getMessage("line.alertNotFoundAttendance", "出勤"));
-				break;
-
-			default:
-				break;
+			} else if (alertMode == 2 && (tmpTa.getAttendanceCd().equals("01"))) {
+				// 最新勤怠情報が出勤 -> 退勤漏れ -> 退勤打刻漏れ防止アラート
+				//LineAPIService.pushMessage(eachUser.getLineId(), AppMesssageSource.getMessage("line.alertNotFoundAttendance", "退勤"));
 			}
 
 			// 送信カウンタを1増やす
@@ -169,17 +164,8 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		}
 
 		// cron時刻範囲が打刻漏れ防止アラート設定時刻外のとき、return 0
-		return 1;
-		// return 0; 上はテスト用、最終的に正しいのはこれ
+		return 0;
 	}
-
-	/**
-	 * 出勤プッシュメソッド
-	 */
-
-	/**
-	 * 退勤プッシュメソッド
-	 */
 
 	/**
 	 * 菅テスト用メソッド
