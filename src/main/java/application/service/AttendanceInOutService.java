@@ -2,6 +2,7 @@ package application.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,13 +23,16 @@ public class AttendanceInOutService extends AbstractAttendanceService {
 	/** このクラスのロガー。 */
 	private static final Logger logger = LoggerFactory.getLogger(AttendanceInOutService.class);
 
+	@Autowired
+	MUserDao mUserDao;
 
 	/**出勤ボタンが押された場合の処理*/
 	public void putArrivalNow(String lineId, String replyToken) {
 
 		/*取得したLINE識別子からユーザを取得*/
-		MUserDao mUserDao = new MUserDao();
+		//MUserDao mUserDao = new MUserDao();
 		MUser mUser = mUserDao.getByLineId(lineId);
+
 
 		/*取得したユーザのユーザIDを取得*/
 		//mUser.getUserId();
@@ -81,7 +85,7 @@ public class AttendanceInOutService extends AbstractAttendanceService {
 	public void putClockOutNow(String lineId, String replyToken) {
 
 		/*取得したLINE識別子からユーザを取得*/
-		MUserDao mUserDao = new MUserDao();
+		//MUserDao mUserDao = new MUserDao();
 		MUser mUser = mUserDao.getByLineId(lineId);
 
 		/*取得したユーザのユーザIDを取得*/
@@ -125,7 +129,7 @@ public class AttendanceInOutService extends AbstractAttendanceService {
 				String msg = AppMesssageSource.getMessage("line.api.err.savedClockOut");
 				LineAPIService.repryMessage(replyToken, msg);
 
-				System.out.println("登録できませんでした");
+				System.out.println("登録できませんでした。");
 			}
 		}
 	}
