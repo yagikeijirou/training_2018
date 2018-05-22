@@ -123,14 +123,14 @@ public class AttendanceInOutService extends AbstractAttendanceService {
 			String msg = AppMesssageSource.getMessage("line.clockOut");
 			//LineAPIService.repryMessage(replyToken, msg);
 
-			System.out.println("登録できました");
+			System.out.println("登録できました。");
 
 		} else {
 			/*退勤時刻登録しないでエラーメッセージ表示する*/
 			String msg = AppMesssageSource.getMessage("line.api.err.savedClockOut");
 			//LineAPIService.repryMessage(replyToken, msg);
 
-			System.out.println("登録できませんでした");
+			System.out.println("登録できませんでした。");
 		}
 	}
 }
