@@ -67,13 +67,9 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 	 */
 	public int pushAlerts(Date beginTime, Date endTime) {
 		// テスト用、最後に削除すること。
-		tests();
-		hodaka();
-		System.err.println("--KASHIWARA BELOW----------------------------------------");
-		AttendanceInOutService aios = new AttendanceInOutService();
-		aios.putArrivalNow("U242fce147b05106f3d5f31e7b82c7747", "");
-		aios.putClockOutNow("U242fce147b05106f3d5f31e7b82c7747", "");
-		System.err.println("--KASHIWARA ABOVE----------------------------------------");
+		//tests();
+		//hodaka();
+		kashiwara();
 
 		logger.debug("pushAlerts()");
 
@@ -99,26 +95,25 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		// TODO: アラートを出し、出した人数をカウント
 
 		for (MUser eachUser : mu) {
-			switch (eachUser.getUserId()) {
-			case 1:
+			System.err.println(tAttendanceDao.getLatestOneByUserId(eachUser.getUserId()));
+			//System.out.println(tAttendanceDao.getLatestOneByUserId(eachUser.getUserId()).getAttendanceCd());
+
+			/**
+			switch (tAttendanceDao.getLatestOneByUserId(eachUser.getUserId()).getAttendanceCd()) {
+			case "01":
 
 				break;
-			case 2:
+			case "02":
 				break;
 
 			default:
 				break;
 			}
-			System.out.println(eachUser.getUserId());
+			**/
+
 		}
 
-		while (true) {
-			//if mode = 1
-			//出勤プッシュメソッド
-			//if mode = 2
-			//退勤プッシュメソッド
-			break;
-		}
+
 
 		System.err.println("Hello");
 		return alertCounter;
@@ -350,6 +345,13 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 //			LineAPIService.pushButtons(lineId, AppMesssageSource.getMessage("line.selectUserByList"), msgList);
 
 		}
+
+	}
+
+	private void kashiwara() {
+		logger.debug("kashiwara()");
+
+
 
 	}
 
