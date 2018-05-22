@@ -31,17 +31,17 @@ public class AttendanceListService extends AbstractAttendanceService {
 	/** このクラスのロガー。 */
 	private static final Logger logger = LoggerFactory.getLogger(AttendanceListService.class);
 
-	/** ユーザ情報DAO。 */
-	@Autowired
-	MUserDao muserDao;
-
 	/** 勤怠情報DAO。 */
 	@Autowired
-	TAttendanceDao tattendanceDao;
+	private TAttendanceDao tAttendanceDao;
 
 	/** LINEステータス情報DAO。 */
 	@Autowired
-	TLineStatusDao tLineStatusDao;
+	private TLineStatusDao tLineStatusDao;
+
+	/** ユーザマスタDAO。 */
+	@Autowired
+	private MUserDao mUserDao;
 
 	/**
 	 * リッチメニューから「リスト」が選択された時の処理。
@@ -63,13 +63,19 @@ public class AttendanceListService extends AbstractAttendanceService {
 	 */
 	public void listAction(String lineId, String replyToken, TLineStatus lineStatus, String text) {
 
-		//入力値チェック(yyyy/mmかどうか、テンプレートメッセージかどうか)
 		//ユーザマスタ検索
 		MUser user = null;
-		if (Pattern.compile("^[0-9]{4}/[01]?[0-9]").matcher(text).find()) {
-			user = muserDao.getByLineId(lineId);
-		} else if(lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION)){
-			user = muserDao.getByName(lineId);
+		String ym = null;
+
+		//年月入力？
+		if (Pattern.compile("^[0-9]{4}/[01]*[0-9]").matcher(text).find()) {
+			user = mUserDao.getByLineId(lineId);
+			ym = text;
+
+		//リスト選択？
+		} else if (lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION)) {
+			user = mUserDao.getByName(text);
+			ym = lineStatus.getActionName();
 		}
 
 		if (user == null) {
@@ -82,27 +88,31 @@ public class AttendanceListService extends AbstractAttendanceService {
 
 		//一般・上司・管理者チェック
 		StringBuilder msg = new StringBuilder();
-		//if (user.getAuthCd().equals("01")) {
-		if (user.getAuthCd().equals("01") || lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION)) {
-			//一般の場合
-			String ym = text;
 
-			//メッセージ作成(mm/dd(D) hh:mm ~ hh:mm #{"修正"}||#{""})
+		if (user.getAuthCd().equals("01") || lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION)) {
+			//勤怠情報表示
+
+			//カレンダー
 			Calendar cal = Calendar.getInstance();
 			cal.set(Calendar.YEAR, Integer.parseInt(ym.split("/")[0]));
 			cal.set(Calendar.MONTH, Integer.parseInt(ym.split("/")[1]));
 			int lastDayOfMonth = cal.getActualMaximum(Calendar.DATE);
 
+			//時刻フォーマット
 			SimpleDateFormat sdf = new SimpleDateFormat("hh:mm");
 
+			//出勤、退勤情報
 			TAttendance arrival_t, clock_out_t;
-			for (int i = 1; i <= lastDayOfMonth; i++) {
 
-				arrival_t = tattendanceDao.getByPk(user.getUserId(), "01",
-						CommonUtils.toYearMonth(text) + String.format("%02d", i));
-				clock_out_t = tattendanceDao.getByPk(user.getUserId(), "02",
-						CommonUtils.toYearMonth(text) + String.format("%02d", i));
-				msg.append(ym.split("/")[1]);
+			//メッセージ作成(mm/dd(D) hh:mm ~ hh:mm #{"修正"}||#{""})
+			for (int i = 1; i <= lastDayOfMonth; i++) {
+				editFlg = false;
+
+				arrival_t = tAttendanceDao.getByPk(user.getUserId(), "01",
+						CommonUtils.toYearMonth(ym) + String.format("%02d", i));
+				clock_out_t = tAttendanceDao.getByPk(user.getUserId(), "02",
+						CommonUtils.toYearMonth(ym) + String.format("%02d", i));
+				msg.append(String.format("%02d", Integer.parseInt(ym.split("/")[1])));
 				msg.append("/");
 				msg.append(String.format("%02d", i));
 				msg.append("(");
@@ -151,7 +161,7 @@ public class AttendanceListService extends AbstractAttendanceService {
 		} else {
 			//上司・管理者の場合
 			//部下情報検索
-			List<MUser> junior = muserDao.getByManagerId(user.getUserId());
+			List<MUser> junior = mUserDao.getByManagerId(user.getUserId());
 
 			//テンプレートメッセージ作成
 			List<String> msgList = new ArrayList<String>();

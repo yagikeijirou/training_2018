@@ -78,7 +78,7 @@ public class APIController {
         res.put("end", CommonUtils.toHMm(endTime));
 
         // アラート対象を送信
-//        int pushCnt = attendanceAlertService.pushAlerts(beginTime, endTime);
+        int pushCnt = attendanceAlertService.pushAlerts(beginTime, endTime);
         // 結果戻し
 //        res.put("pushCount", pushCnt);
         return JSONUtils.buildJSON(res);
