@@ -380,41 +380,36 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		//linestatus.getRequestTime();
 
 
-		TAttendance tAttendance = new TAttendance();
+		/*リクエスト時刻をString型に変換*/
+		SimpleDateFormat sdf2 = new SimpleDateFormat("yyyyMMdd");
+		String reqtime = sdf2.format(tLineStatus.getRequestTime());
 
-		/*勤怠情報からユーザIDを取得*/
-		//tA.getUserId();
+		/*取得したユーザID,勤怠区分コード,リクエスト時刻から勤怠情報エンティティを取得*/
+		TAttendance t_attendance = tAttendanceDao.getByPk(mUser.getUserId(), "02", reqtime);
 
-		/*勤怠情報から勤怠時刻を取得*/
-		//tA.getAttendanceTime();
-
-
-		/*ユーザマスタのユーザIDと勤怠情報のユーザIDが一致するレコードを検索*/
-		if (tAttendance.getUserId() == mUser.getUserId()) {
+		System.out.println("年月日は"+t_attendance);
 
 			/*勤怠情報の勤怠時刻に既に出勤打刻が登録されていないか確認*/
-			if ((tAttendance.getAttendanceTime() == null) && (tAttendance.getAttendanceCd() == "02")) {
+			if ((t_attendance == null) ) {
 
 				/*リクエスト時刻を退勤時刻として登録する*/
-				tAttendance.setAttendanceTime(tLineStatus.getRequestTime()) ;
+				t_attendance.setAttendanceTime(tLineStatus.getRequestTime()) ;
+
+				tAttendanceDao.insert(t_attendance);
 
 				/*メッセージをLINEアプリ上で表示させて処理を終了する*/
 				String msg = AppMesssageSource.getMessage("line.clockOut");
-				LineAPIService.repryMessage(replyToken, msg);
+				//LineAPIService.repryMessage(replyToken, msg);
 
 				System.out.println("登録できました");
 
 			} else {
 				/*退勤時刻登録しないでエラーメッセージ表示する*/
 				String msg = AppMesssageSource.getMessage("line.api.err.savedClockOut");
-				LineAPIService.repryMessage(replyToken, msg);
+				//LineAPIService.repryMessage(replyToken, msg);
 
-				System.out.println("登録できませんでした。");
+				System.out.println("登録できませんでした");
 			}
-		}
-
-
-
 	}
 
 }
