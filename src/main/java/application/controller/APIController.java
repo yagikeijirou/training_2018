@@ -80,7 +80,7 @@ public class APIController {
         // アラート対象を送信
         int pushCnt = attendanceAlertService.pushAlerts(beginTime, endTime);
         // 結果戻し
-//        res.put("pushCount", pushCnt);
+        res.put("pushCount", pushCnt);
         return JSONUtils.buildJSON(res);
     }
 }
