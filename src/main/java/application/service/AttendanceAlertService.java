@@ -105,9 +105,17 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 			if (alertMode == 1 && (tmpTa.getAttendanceCd().equals("02"))) {
 				// 最新勤怠情報が退勤 -> 出勤漏れ -> 出勤打刻漏れ防止アラート
 				//LineAPIService.pushMessage(eachUser.getLineId(), AppMesssageSource.getMessage("line.alertNotFoundAttendance", "出勤"));
+				System.out.println("★★★★★★★★★★★★★★★★★★★★★");
+				System.out.println(AppMesssageSource.getMessage("line.alertNotFoundAttendance", "出勤"));
+				System.out.println("lineId: " + eachUser.getLineId());
+				System.out.println("★★★★★★★★★★★★★★★★★★★★★");
 			} else if (alertMode == 2 && (tmpTa.getAttendanceCd().equals("01"))) {
 				// 最新勤怠情報が出勤 -> 退勤漏れ -> 退勤打刻漏れ防止アラート
 				//LineAPIService.pushMessage(eachUser.getLineId(), AppMesssageSource.getMessage("line.alertNotFoundAttendance", "退勤"));
+				System.out.println("★★★★★★★★★★★★★★★★★★★★★");
+				System.out.println(AppMesssageSource.getMessage("line.alertNotFoundAttendance", "退勤"));
+				System.out.println("lineId: " + eachUser.getLineId());
+				System.out.println("★★★★★★★★★★★★★★★★★★★★★");
 			}
 
 			// 送信カウンタを1増やす
