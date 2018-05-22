@@ -69,6 +69,11 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		// テスト用、最後に削除すること。
 		tests();
 		hodaka();
+		System.err.println("--KASHIWARA BELOW----------------------------------------");
+		AttendanceInOutService aios = new AttendanceInOutService();
+		aios.putArrivalNow("U242fce147b05106f3d5f31e7b82c7747", "");
+		aios.putClockOutNow("U242fce147b05106f3d5f31e7b82c7747", "");
+		System.err.println("--KASHIWARA ABOVE----------------------------------------");
 
 		logger.debug("pushAlerts()");
 
