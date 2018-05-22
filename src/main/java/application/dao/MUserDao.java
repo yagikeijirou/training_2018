@@ -17,102 +17,137 @@ import ninja.cero.sqltemplate.core.SqlTemplate;
  */
 @Component
 public class MUserDao extends AbstractDao<MUser> {
-    //    /** このクラスのロガー。 */
-    //    private static final Logger logger = LoggerFactory.getLogger(MUserDao.class);
+	//    /** このクラスのロガー。 */
+	//    private static final Logger logger = LoggerFactory.getLogger(MUserDao.class);
 
-    @Autowired
-    private SqlTemplate sqlTemplate;
+	@Autowired
+	private SqlTemplate sqlTemplate;
 
-    public Optional<MUser> selectByPk(Integer userId) {
-        return Optional.ofNullable(sqlTemplate.forObject("sql/MUserDao/selectByPk.sql", MUser.class, userId));
-    }
+	public Optional<MUser> selectByPk(Integer userId) {
+		return Optional.ofNullable(sqlTemplate.forObject("sql/MUserDao/selectByPk.sql", MUser.class, userId));
+	}
 
-    /**
-     * PKでユーザを取得する。
-     * @param userId ユーザID
-     * @return ユーザ
-     */
-    public MUser getByPk(Integer userId) {
-        if (userId == null) {
-            return null;
-        }
-        Optional<MUser> select = selectByPk(userId);
-        MUser res = null;
-        if (select.isPresent()) {
-            res = select.get();
-        }
-        return res;
-    }
+	/**
+	 * PKでユーザを取得する。
+	 * @param userId ユーザID
+	 * @return ユーザ
+	 */
+	public MUser getByPk(Integer userId) {
+		if (userId == null) {
+			return null;
+		}
+		Optional<MUser> select = selectByPk(userId);
+		MUser res = null;
+		if (select.isPresent()) {
+			res = select.get();
+		}
+		return res;
+	}
 
-    /**
-     * メールアドレスでユーザを取得する。
-     * @param mail
-     * @return ユーザ
-     */
-    public Optional<MUser> selectByMail(String mail) {
-        return Optional.ofNullable(sqlTemplate.forObject("sql/MUserDao/selectByMail.sql", MUser.class, mail));
-    }
+	/**
+	 * メールアドレスでユーザを取得する。
+	 * @param mail
+	 * @return ユーザ
+	 */
+	public Optional<MUser> selectByMail(String mail) {
+		return Optional.ofNullable(sqlTemplate.forObject("sql/MUserDao/selectByMail.sql", MUser.class, mail));
+	}
 
-    /**
-     * LINE IDでユーザを取得する。
-     * @param lineId LINE ID
-     * @return ユーザ
-     */
-    public Optional<MUser> selectByLineId(String lineId) {
-        return Optional.ofNullable(sqlTemplate.forObject("sql/MUserDao/selectByLineId.sql", MUser.class, lineId));
-    }
+	/**
+	 * LINE IDでユーザを取得する。
+	 * @param lineId LINE ID
+	 * @return ユーザ
+	 */
+	public Optional<MUser> selectByLineId(String lineId) {
+		return Optional.ofNullable(sqlTemplate.forObject("sql/MUserDao/selectByLineId.sql", MUser.class, lineId));
+	}
 
-    /**
-     * LINE IDでユーザを取得する。
-     * @param lineId LINE識別子
-     * @return ユーザ
-     */
-    public MUser getByLineId(String lineId) {
-        Optional<MUser> select = selectByLineId(lineId);
-        MUser res = null;
-        if (select.isPresent()) {
-            res = select.get();
-        }
-        return res;
-    }
+	/**
+	 * LINE IDでユーザを取得する。
+	 * @param lineId LINE識別子
+	 * @return ユーザ
+	 */
+	public MUser getByLineId(String lineId) {
+		Optional<MUser> select = selectByLineId(lineId);
+		MUser res = null;
+		if (select.isPresent()) {
+			res = select.get();
+		}
+		return res;
+	}
 
-    /**
-     * 上司IDでユーザを取得する。
-     *
-     * @param managerId ユーザID
-     * @return ユーザエンティティリスト
-     * @author 隅田穂高
-     */
-    public List<MUser> getByManagerId(int managerId) {
-        Map<String, Object> cond = new HashMap<>();
-        cond.put("managerId", managerId);
-        return sqlTemplate.forList("sql/MUserDao/selectByManagerId.sql", MUser.class, cond);
-    }
+	/**
+	 * 上司IDでユーザを取得する。
+	 *
+	 * @param managerId ユーザID
+	 * @return ユーザエンティティリスト
+	 * @author 隅田穂高
+	 */
+	public List<MUser> getByManagerId(int managerId) {
+		Map<String, Object> cond = new HashMap<>();
+		cond.put("managerId", managerId);
+		return sqlTemplate.forList("sql/MUserDao/selectByManagerId.sql", MUser.class, cond);
+	}
 
-    /**
-     * ユーザを新規登録する。
-     * @param ユーザエンティティ
-     */
-    public int insert(MUser entity) {
-        setInsertColumns(entity);
-        return sqlTemplate.update("sql/MUserDao/insert.sql", entity);
-    }
+	/**
+	 * 全てのユーザを取り出す。
+	 *
+	 * @return ユーザエンティティリスト
+	 * @author 菅一生
+	 */
+	public List<MUser> getAll() {
+		return sqlTemplate.forList("sql/MUserDao/selectAll.sql", MUser.class);
+	}
 
-    /**
-     * ユーザを更新する。
-     * @param ユーザエンティティ
-     */
-    public int update(MUser entity) {
-        setUpdateColumns(entity);
-        return sqlTemplate.update("sql/MUserDao/update.sql", entity);
-    }
+	/**
+	 * ユーザ氏名でユーザを取得する。
+	 * @param name ユーザ氏名
+	 * @return ユーザ
+	 * @author 菅一生
+	 */
+	public Optional<MUser> selectByName(String name) {
+		return Optional.ofNullable(sqlTemplate.forObject("sql/MUserDao/selectByName.sql", MUser.class, name));
+	}
 
-    /**
-     * ユーザを更新する(null値は更新対象外)。
-     * @param ユーザエンティティ
-     */
-    public int updateAsNullIsExclude(MUser entity) {
-        setUpdateColumns(entity);
-        return sqlTemplate.update("sql/MUserDao/updateAsNullIsExclude.sql", entity);
-    }
+	/**
+	 * ユーザ氏名でユーザを取得する。
+	 * @param name ユーザ氏名
+	 * @return ユーザ
+	 * @author 菅一生
+	 */
+	public MUser getByName(String name) {
+		Optional<MUser> select = selectByName(name);
+		MUser res = null;
+		if (select.isPresent()) {
+			res = select.get();
+		}
+		return res;
+	}
+
+	/**
+	 * ユーザを新規登録する。
+	 * @param ユーザエンティティ
+	 */
+	public int insert(MUser entity) {
+		setInsertColumns(entity);
+		return sqlTemplate.update("sql/MUserDao/insert.sql", entity);
+	}
+
+	/**
+	 * ユーザを更新する。
+	 * @param ユーザエンティティ
+	 */
+	public int update(MUser entity) {
+		setUpdateColumns(entity);
+		return sqlTemplate.update("sql/MUserDao/update.sql", entity);
+	}
+
+	/**
+	 * ユーザを更新する(null値は更新対象外)。
+	 * @param ユーザエンティティ
+	 */
+	public int updateAsNullIsExclude(MUser entity) {
+		setUpdateColumns(entity);
+		return sqlTemplate.update("sql/MUserDao/updateAsNullIsExclude.sql", entity);
+	}
 }

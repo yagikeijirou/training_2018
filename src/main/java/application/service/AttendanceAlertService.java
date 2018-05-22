@@ -88,6 +88,13 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		}
 
 		// TODO: アラートを出し、出した人数をカウント
+
+		/**
+		for (MUser result : mu) {
+			System.out.println(result.getUserId());
+		}
+		**/
+
 		while (true) {
 			//if mode = 1
 			//出勤プッシュメソッド
@@ -158,7 +165,6 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 	 * 退勤プッシュメソッド
 	 */
 
-
 	/**
 	 * 菅テスト用メソッド
 	 * @author 菅一生
@@ -172,13 +178,32 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		//TAttendance ta = tAttendanceDao.getByPk(userId, attendanceCd, attendanceDay);
 		//List<TAttendance> ta = tAttendanceDao.getByUserIdAndAttendanceMonth(userId, attendanceMonth);
 		List<TAttendance> ta = tAttendanceDao.getByAttendanceMonth(attendanceMonth);
+		List<MUser> mu = mUserDao.getAll();
 
+		/**
 		System.out.println("--ANSWER BELOW----------------------------------------");
 		//System.out.println(ta);
 
 		for (TAttendance result : ta) {
 			System.out.println(result);
 		}
+
+		System.out.println("--ANSWER ABOVE----------------------------------------");
+		**/
+
+		/**
+		System.out.println("--ANSWER BELOW----------------------------------------");
+
+		for (MUser result : mu) {
+			System.out.println(result.getUserId());
+		}
+
+		System.out.println("--ANSWER ABOVE----------------------------------------");
+		**/
+
+		System.out.println("--ANSWER BELOW----------------------------------------");
+
+		System.out.println(tAttendanceDao.getLatestOneByUserId(201618));
 
 		System.out.println("--ANSWER ABOVE----------------------------------------");
 
@@ -295,19 +320,19 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 	}
 
 	/**
-     * 前回のLINE操作を取得する。
-     * @param lineId 送信元LINE識別子
-     * @return LINEステータス。存在しない場合、初期値をセットした新規行
-     */
-    private TLineStatus getLineSutatus(String lineId) {
-        TLineStatus res = tLineStatusDao.getByPk(lineId);
-        if (res == null) {
-            res = new TLineStatus();
-            res.setLineId(lineId);
-            MUser user = mUserDao.getByLineId(lineId);
-            res.setUserId(user.getUserId());
-        }
-        return res;
-    }
+	 * 前回のLINE操作を取得する。
+	 * @param lineId 送信元LINE識別子
+	 * @return LINEステータス。存在しない場合、初期値をセットした新規行
+	 */
+	private TLineStatus getLineSutatus(String lineId) {
+		TLineStatus res = tLineStatusDao.getByPk(lineId);
+		if (res == null) {
+			res = new TLineStatus();
+			res.setLineId(lineId);
+			MUser user = mUserDao.getByLineId(lineId);
+			res.setUserId(user.getUserId());
+		}
+		return res;
+	}
 
 }
