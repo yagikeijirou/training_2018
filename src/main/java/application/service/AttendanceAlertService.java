@@ -67,20 +67,18 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 	 */
 	public int pushAlerts(Date beginTime, Date endTime) {
 		// テスト用、最後に削除すること。
-		//tests();
+		tests();
 		//hodaka();
 		kashiwara();
 
 		logger.debug("pushAlerts()");
 
-		/** アラートモード（1：出勤打刻防止、2：退勤打刻防止、0：アラート不要）**/
-		int alertMode = 0;
-
 		/** アラートを出した人の数 **/
 		int alertCounter = 0;
-
 		/** ユーザマスタの全ユーザのエンティティリスト **/
 		List<MUser> mu = mUserDao.getAll();
+		/** アラート出力用一時勤怠情報 **/
+		TAttendance tmpTa = null;
 
 		// フラグが0ならここで終了、1なら続行
 		if (mSettingDao.get().getAlertFlag().equals("0")) {
@@ -88,34 +86,39 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		}
 
 		// 今がアラートを出すときではないならここで終了、出すときなら続行
-		if ((alertMode = alertModeChecker(beginTime, endTime)) == 0) {
+		if ((alertModeChecker(beginTime, endTime)) == 0) {
 			return 0;
 		}
 
-		// TODO: アラートを出し、出した人数をカウント
-
+		// ユーザマスタにある全ユーザのリストがmu、その1つをeachUserに入れてそれぞれ処理
 		for (MUser eachUser : mu) {
-			System.err.println(tAttendanceDao.getLatestOneByUserId(eachUser.getUserId()));
-			//System.out.println(tAttendanceDao.getLatestOneByUserId(eachUser.getUserId()).getAttendanceCd());
+			tmpTa = tAttendanceDao.getLatestOneByUserId(eachUser.getUserId());
 
-			/**
-			switch (tAttendanceDao.getLatestOneByUserId(eachUser.getUserId()).getAttendanceCd()) {
+			// 指定ユーザの勤怠情報が未登録の時、次のユーザへ進む
+			if (tmpTa == null) {
+				continue;
+			}
+
+			switch (tmpTa.getAttendanceCd()) {
 			case "01":
-
+				// 最新勤怠情報が出勤 -> 退勤漏れ -> 退勤打刻漏れ防止アラート
+				//LineAPIService.pushMessage(eachUser.getLineId(), AppMesssageSource.getMessage("line.alertNotFoundAttendance", "退勤"));
 				break;
+
 			case "02":
+				// 最新勤怠情報が退勤 -> 出勤漏れ -> 出勤打刻漏れ防止アラート
+				//LineAPIService.pushMessage(eachUser.getLineId(), AppMesssageSource.getMessage("line.alertNotFoundAttendance", "出勤"));
 				break;
 
 			default:
 				break;
 			}
-			**/
+
+			// 送信カウンタを1増やす
+			alertCounter++;
 
 		}
 
-
-
-		System.err.println("Hello");
 		return alertCounter;
 	}
 
@@ -184,6 +187,7 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 	private void tests() {
 		logger.debug("tests()");
 		int userId = 201618;
+		String lineId = "U242fce147b05106f3d5f31e7b82c7747";
 		String attendanceCd = "02";
 		String attendanceDay = "20180330";
 		String attendanceMonth = "201803";
@@ -213,12 +217,13 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		System.out.println("--ANSWER ABOVE----------------------------------------");
 		**/
 
+		/**
 		System.out.println("--ANSWER BELOW----------------------------------------");
 
 		System.out.println(tAttendanceDao.getLatestOneByUserId(201618));
 
 		System.out.println("--ANSWER ABOVE----------------------------------------");
-
+		**/
 	}
 
 	private void hodaka() {
@@ -239,7 +244,8 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 
 		//一般・上司・管理者チェック
 		StringBuilder msg = new StringBuilder();
-		if (user.getAuthCd().equals("01") || (lineStatus!=null && lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION))) {
+		if (user.getAuthCd().equals("01")
+				|| (lineStatus != null && lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION))) {
 			//一般の場合
 			//勤怠情報検索
 			//			List<TAttendance> tattendance = tattendanceDao.getByAttendanceMonth(user.getUserId(), text);
@@ -254,14 +260,16 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 			SimpleDateFormat sdf2 = new SimpleDateFormat("hh:mm");
 
 			TAttendance arrival_t, clock_out_t;
-			for (int i = 1; i <= lastDayOfMonth+1; i++) {
+			for (int i = 1; i <= lastDayOfMonth + 1; i++) {
 				editFlg = false;
 
-				arrival_t = tattendanceDao.getByPk(user.getUserId(), "01", CommonUtils.toYearMonth(text) + String.format("%02d",i));
-				clock_out_t = tattendanceDao.getByPk(user.getUserId(), "02", CommonUtils.toYearMonth(text) + String.format("%02d",i));
+				arrival_t = tattendanceDao.getByPk(user.getUserId(), "01",
+						CommonUtils.toYearMonth(text) + String.format("%02d", i));
+				clock_out_t = tattendanceDao.getByPk(user.getUserId(), "02",
+						CommonUtils.toYearMonth(text) + String.format("%02d", i));
 				msg.append(text.split("/")[1]);
 				msg.append("/");
-				msg.append(String.format("%02d",i));
+				msg.append(String.format("%02d", i));
 				msg.append("(");
 				cal.set(Calendar.DATE, i);
 				msg.append(sdf1.format(cal.getTime()));
@@ -305,14 +313,14 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 			System.out.println(msg.toString());
 
 			//LINEステータス更新
-//			lineStatus = getLineSutatus(lineId);
-//			lineStatus.setMenuCd("empty");
-//			lineStatus.setActionName(null);
-//			lineStatus.setContents(text);
-//			tLineStatusDao.save(lineStatus);
+			//			lineStatus = getLineSutatus(lineId);
+			//			lineStatus.setMenuCd("empty");
+			//			lineStatus.setActionName(null);
+			//			lineStatus.setContents(text);
+			//			tLineStatusDao.save(lineStatus);
 
 			//メッセージの送信
-//			LineAPIService.repryMessage(replyToken, msg.toString());
+			//			LineAPIService.repryMessage(replyToken, msg.toString());
 		} else {
 			//上司・管理者の場合
 			//部下情報検索
@@ -335,14 +343,14 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 			}
 
 			//LINEステータス更新
-//			lineStatus = getLineSutatus(lineId);
-//			lineStatus.setMenuCd("03");
-//			lineStatus.setActionName(ACTION_LIST_USER_SELECTION);
-//			lineStatus.setContents(text);
-//			tLineStatusDao.save(lineStatus);
+			//			lineStatus = getLineSutatus(lineId);
+			//			lineStatus.setMenuCd("03");
+			//			lineStatus.setActionName(ACTION_LIST_USER_SELECTION);
+			//			lineStatus.setContents(text);
+			//			tLineStatusDao.save(lineStatus);
 
 			//テンプレートメッセージ送信
-//			LineAPIService.pushButtons(lineId, AppMesssageSource.getMessage("line.selectUserByList"), msgList);
+			//			LineAPIService.pushButtons(lineId, AppMesssageSource.getMessage("line.selectUserByList"), msgList);
 
 		}
 
@@ -350,8 +358,6 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 
 	private void kashiwara() {
 		logger.debug("kashiwara()");
-
-
 
 	}
 
