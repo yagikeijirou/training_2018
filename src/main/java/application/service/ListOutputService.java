@@ -1,17 +1,17 @@
 package application.service;
 
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.List;
-
-import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 import application.dao.MUserDao;
 import application.dao.TAttendanceDao;
+import application.entity.MUser;
 import application.entity.TAttendance;
 import application.utils.CommonUtils;
 
@@ -23,17 +23,31 @@ import application.utils.CommonUtils;
  */
 @Service
 @Transactional
+@JsonPropertyOrder({ "id", "name", "date", "arrival", "clock-out" })
 public class ListOutputService {
 
 	@Autowired
 	TAttendanceDao tattendancedao;
+
+	@Autowired
 	MUserDao muserdao;
 
-	public void csvDownload(HttpServletResponse response, String outputYearMonth) {
+	@JsonProperty("id")
+	private Integer id;
 
-		//文字コードと出力するCSVファイル名を設定
-		response.setContentType("application/octet-stream");
-		response.setHeader("Content-Disposition", "attachment; filename=\"yyyymm.csv\"");
+	@JsonProperty("name")
+	private String name;
+
+	@JsonProperty("date")
+	private String date;
+
+	@JsonProperty("arrival")
+	private String arrival;
+
+	@JsonProperty("clock-out")
+	private String clockout;
+
+	public String csvDownload(String outputYearMonth) {
 
 		//データベースに接続する
 		//SQLを発行する
@@ -42,39 +56,64 @@ public class ListOutputService {
 		//勤怠情報：出勤日
 		//勤怠情報：勤怠区分コード
 		//勤怠情報：勤怠時刻
+		System.out.println(CommonUtils.toYearMonth(outputYearMonth));
 
-		List<TAttendance> tattendances = tattendancedao.getByAttendanceMonth(outputYearMonth);
+		List<TAttendance> tattendances = tattendancedao.getByAttendanceMonth(CommonUtils.toYearMonth(outputYearMonth));
 
-		try (PrintWriter pw = response.getWriter()) {
-			{
-				String lineSepa = System.getProperty("line.separator");
-				for (TAttendance ta : tattendances) {
+		System.out.print(tattendances.toString());
+		StringBuilder sb = new StringBuilder();
+		MUser user;
 
-					Integer id = ta.getUserId();
-					String name = muserdao.getByPk(id).getName();
+					sb.append("id");
+		    sb.append(",");
+		    sb.append("name");
+		    sb.append(",");
+		    sb.append("date");
+		    sb.append(",");
+		    sb.append("arrival");
+		    sb.append(",");
+		    sb.append("clock-out");
+		    sb.append("\r\n");
 
-					String date = ta.getAttendanceDay();
-					date = date.substring(6);
-					String time = CommonUtils.toHMm(ta.getAttendanceTime());
+		for (TAttendance ta : tattendances) {
 
-					String code = ta.getAttendanceCd();
-					String arrival = "";
-					String clockout = "";
 
-					if (code.equals("01")) {
-						arrival = time;
-					} else {
-						clockout = time;
-					}
-					//CSVファイル内部に記載する形式で文字列を設定
-					String str = id + "," + name + "," + date + "," + arrival + "," + clockout + "," + lineSepa;
-
-					//CSVファイルに書き込み
-					pw.print(str);
-				}
+			id = ta.getUserId();
+			user = muserdao.getByPk(id);
+			if(user == null) {
+				continue;
 			}
-		} catch (IOException e) {
-			System.out.println("Exception :" + e.getMessage());
+
+			name = user.getName();
+
+			date = ta.getAttendanceDay();
+			date = date.substring(6);
+			String time = CommonUtils.toHMm(ta.getAttendanceTime());
+
+			String code = ta.getAttendanceCd();
+			arrival = "";
+			clockout = "";
+
+			if (code.equals("01")) {
+				arrival = time;
+			} else {
+				clockout = time;
+			}
+
+		    sb.append(id);
+		    sb.append(",");
+		    sb.append(name);
+		    sb.append(",");
+		    sb.append(date);
+		    sb.append(",");
+		    sb.append(arrival);
+		    sb.append(",");
+		    sb.append(clockout);
+		    sb.append("\r\n");
+
+			System.out.println(sb);
+
 		}
+		return new String(sb);
 	}
 }
