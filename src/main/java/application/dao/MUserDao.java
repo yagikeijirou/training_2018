@@ -130,6 +130,39 @@ public class MUserDao extends AbstractDao<MUser> {
 	}
 
 	/**
+	 * 組織コードから全てのユーザを取り出す。
+	 * @param orgCd 組織コード
+	 * @return ユーザエンティティリスト
+	 * @author 菅一生
+	 */
+	public List<MUser> getAllUserByOrgCd(String orgCd) {
+		Map<String, Object> cond = new HashMap<>();
+		cond.put("orgCd", orgCd);
+		return sqlTemplate.forList("sql/MUserDao/selectAll.sql", MUser.class, cond);
+	}
+
+
+	/**
+	 * 権限コードから権限名を取得する。
+	 * @param authCd 権限コード
+	 * @return authName 権限名
+	 * @author 黄倉大輔
+	 */
+	public String getAuthNameByAuthCd(String authCd) {
+		switch (authCd) {
+		case "1":
+			return "一般";
+		case "2":
+			return "上長";
+		case "3":
+			return "管理者";
+		default:
+			return "権限未設定";
+		}
+	}
+
+
+	/**
 	 * ユーザを新規登録する。
 	 * @param ユーザエンティティ
 	 */

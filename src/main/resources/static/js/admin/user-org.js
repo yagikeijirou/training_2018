@@ -271,7 +271,7 @@ function openUpdateUser(targetUserId) {
 	          $form.find('#user-id').val(res.results.userId);
 	          $form.find('#name').val(res.results.name);
 	          $form.find('#mail').val(res.results.mail);
-	          $form.find('#line-id').val(res.results.lineId);
+	          //$form.find('#line-id').val(res.results.lineId);　←今回は表示しない？？
 	          // optionタグを挿入しているのは、外部からSelect2に値を設定する際に必要なため
 	          $form.find('#user-org-cd').append('<option value="' + res.results.orgCd + '" selected="selected">' + res.orgName + '</option>').change();
 	          $form.find('#auth-cd').append('<option value="' + res.results.authCd + '" selected="selected">' + res.authName + '</option>').change();
