@@ -13,7 +13,6 @@ import application.context.AppMesssageSource;
 import application.dao.MSettingDao;
 import application.dao.MUserDao;
 import application.dao.TAttendanceDao;
-import application.dao.TLineStatusDao;
 import application.entity.MSetting;
 import application.entity.MUser;
 import application.entity.TAttendance;
@@ -41,20 +40,6 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 	@Autowired
 	private TAttendanceDao tAttendanceDao;
 
-	/////
-
-	@Autowired
-	MUserDao muserDao;
-
-	@Autowired
-	TAttendanceDao tattendanceDao;
-
-	/** LINEステータス情報DAO。 */
-	@Autowired
-	TLineStatusDao tLineStatusDao;
-
-	/////
-
 	/**
 	 * 出退勤打刻漏れ防止アラート送信メソッド
 	 * <pre>
@@ -67,9 +52,6 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 	 * @return アラートを出した人数
 	 */
 	public int pushAlerts(Date beginTime, Date endTime) {
-		// テスト用、最後に削除すること。
-
-
 		logger.debug("pushAlerts()");
 
 		/** アラートモード（1：出勤打刻防止、2：退勤打刻防止、0：アラート不要）**/
@@ -178,8 +160,5 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		// cron時刻範囲が打刻漏れ防止アラート設定時刻外のとき、return 0
 		return 0;
 	}
-
-
-
 
 }
