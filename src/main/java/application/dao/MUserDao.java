@@ -1,8 +1,6 @@
 package application.dao;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,9 +87,7 @@ public class MUserDao extends AbstractDao<MUser> {
 	 * @author 隅田穂高
 	 */
 	public List<MUser> getByManagerId(int managerId) {
-		Map<String, Object> cond = new HashMap<>();
-		cond.put("managerId", managerId);
-		return sqlTemplate.forList("sql/MUserDao/selectByManagerId.sql", MUser.class, cond);
+		return sqlTemplate.forList("sql/MUserDao/selectByManagerId.sql", MUser.class, managerId);
 	}
 
 	/**
