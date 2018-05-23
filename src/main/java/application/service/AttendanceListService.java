@@ -51,7 +51,8 @@ public class AttendanceListService extends AbstractAttendanceService {
 
 		//メッセージの送信
 		String msg = AppMesssageSource.getMessage("line.listYearMonth");
-		LineAPIService.repryMessage(replyToken, msg);
+		System.out.println(msg);
+		//LineAPIService.repryMessage(replyToken, msg);
 	}
 
 	/**
@@ -71,15 +72,24 @@ public class AttendanceListService extends AbstractAttendanceService {
 		if (Pattern.compile("^[0-9]{4}/[01]*[0-9]").matcher(text).find()) {
 			user = mUserDao.getByLineId(lineId);
 			ym = text;
+			System.out.println("年月入力");
 
 		//リスト選択？
 		} else if (lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION)) {
 			user = mUserDao.getByPk(Integer.parseInt(text.split(" ")[0]));
-			ym = lineStatus.getActionName();
+			ym = lineStatus.getContents();
+			System.out.println("リスト選択");
+			System.out.println(ym);
+			System.out.println(text);
+		} else {
+			System.out.println("年月入力リスト選択以外");
+			//LineAPIService.repryMessage(replyToken, AppMesssageSource.getMessage("line.api.err.userNotExists"));
+			return;
 		}
 
 		if (user == null) {
-			LineAPIService.repryMessage(replyToken, AppMesssageSource.getMessage("line.api.err.userNotExists"));
+			System.out.println("ユーザー不在");
+			//LineAPIService.repryMessage(replyToken, AppMesssageSource.getMessage("line.api.err.userNotExists"));
 			return;
 		}
 
@@ -89,7 +99,7 @@ public class AttendanceListService extends AbstractAttendanceService {
 		//一般・上司・管理者チェック
 		StringBuilder msg = new StringBuilder();
 
-		if (user.getAuthCd().equals("01") || lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION)) {
+		if (user.getAuthCd().equals("01") || (lineStatus.getActionName() !=null && lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION))) {
 			//勤怠情報表示
 
 			//カレンダー
@@ -151,7 +161,10 @@ public class AttendanceListService extends AbstractAttendanceService {
 			}
 
 			//単体テスト用
+			System.out.println("_____msgList_____");
 			System.out.println(msg.toString());
+			System.out.println("_____msgList_____");
+
 
 			//LINEステータス更新
 			lineStatus.setMenuCd("empty");
@@ -169,10 +182,13 @@ public class AttendanceListService extends AbstractAttendanceService {
 			//テンプレートメッセージ作成
 			List<String> msgList = new ArrayList<String>();
 			for (MUser mu : junior) {
-				msgList.add(mu.getUserId().toString());
-				msgList.add(" ");
-				msgList.add(mu.getName());
+				msgList.add(mu.getUserId().toString() + " " + mu.getName());
 			}
+
+			//単体テスト用
+			System.out.println("_____msgList_____");
+			System.out.println(msgList.toString());
+			System.out.println("_____msgList_____");
 
 			//LINEステータス更新
 			lineStatus.setMenuCd("03");

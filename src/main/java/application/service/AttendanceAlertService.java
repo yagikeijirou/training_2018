@@ -56,7 +56,11 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 	/////
 
 	/**
-	 * ある時間範囲に、打刻漏れ防止アラートを出すよう設定された時刻が含まれていた場合、アラートを出すメソッド。
+	 * 出退勤打刻漏れ防止アラート送信メソッド
+	 * <pre>
+	 * ある時間範囲に、打刻漏れ防止アラートを出すよう
+	 * 設定された時刻が含まれていた場合、アラートを出すメソッド。
+	 * </pre>
 	 *
 	 * @param beginTime ある時間範囲の開始時刻
 	 * @param endTime ある時間範囲の終了時刻
@@ -79,13 +83,17 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 
 		// フラグが0ならここで終了、1なら続行
 		if (mSettingDao.get().getAlertFlag().equals("0")) {
+			System.out.println("★★★★★★★★★★★★★★★★★★★★★");
 			System.out.println("打刻漏れ防止アラートが設定されていません。");
+			System.out.println("★★★★★★★★★★★★★★★★★★★★★");
 			return 0;
 		}
 
 		// 今がアラートを出すときではないならここで終了、出すときなら続行
 		if ((alertMode = alertModeChecker(beginTime, endTime)) == 0) {
+			System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
 			System.out.println("打刻漏れ防止アラートを出す時刻ではありません。");
+			System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
 			return 0;
 		}
 
