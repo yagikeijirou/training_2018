@@ -62,7 +62,7 @@ public class UserService {
      * @return Map<String,Object> ユーザ情報リスト
      */
     public Map<String, Object> getUser(String orgCd) {
-    	List<MUser> mUsers = muserDao.getAll();
+    	List<MUser> mUsers = muserDao.getAllUserByOrgCd(orgCd);
 		Map<String, Object> map2 = new HashMap<String, Object>();
 		MOrg mOrg = morgDao.getByPk(orgCd);
 		int i = 0;
