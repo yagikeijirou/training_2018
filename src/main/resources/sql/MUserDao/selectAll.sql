@@ -1,3 +1,3 @@
 SELECT *
  FROM m_user
-AND del_flg = '0'
+WHERE del_flg = '0'

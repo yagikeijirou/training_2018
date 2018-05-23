@@ -153,11 +153,12 @@ public class UserService {
 	}
 
 	/**
-	 * ユーザを削除する。
-	 * @param mUser ユーザマスタエンティティ
+	 * 指定されたユーザエンティティリストの全ユーザを削除する。
+	 * @param mUser ユーザマスタエンティティリスト
 	 * @author 黄倉大輔
+	 * @author 菅一生
 	 */
-	public void deleteUser(MUser mUser) {
-		muserDao.delete(mUser);
+	public void deleteSomeUsers(List<MUser> mUsers) {
+		// List<MUser> mUsersを全て論理削除する
 	}
 }
