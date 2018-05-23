@@ -89,9 +89,7 @@ public class MUserDao extends AbstractDao<MUser> {
 	 * @author 隅田穂高
 	 */
 	public List<MUser> getByManagerId(int managerId) {
-		Map<String, Object> cond = new HashMap<>();
-		cond.put("managerId", managerId);
-		return sqlTemplate.forList("sql/MUserDao/selectByManagerId.sql", MUser.class, cond);
+		return sqlTemplate.forList("sql/MUserDao/selectByManagerId.sql", MUser.class, managerId);
 	}
 
 	/**
