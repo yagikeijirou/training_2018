@@ -153,12 +153,15 @@ public class UserService {
 	}
 
 	/**
-	 * 指定されたユーザエンティティリストの全ユーザを削除する。
-	 * @param mUser ユーザマスタエンティティリスト
+	 * 指定されたユーザIDについて、ユーザマスタから論理削除する。
+	 * @param userIds 削除したいユーザのユーザIDリスト
 	 * @author 黄倉大輔
 	 * @author 菅一生
 	 */
-	public void deleteSomeUsers(List<MUser> mUsers) {
+	public void deleteSomeUsers(List<Integer> userIds) {
 		// List<MUser> mUsersを全て論理削除する
+		//for (MUser eachUser : mUsers) {
+		//	muserDao.delete(eachUser);
+		//}
 	}
 }
