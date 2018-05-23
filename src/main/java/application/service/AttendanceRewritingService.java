@@ -25,6 +25,7 @@ import application.entity.TLineStatus;
  * 更新日付   - 更新者       - 更新内容
  * 2018/05/21-須永寛紀-新規コーディング
  * 2018/05/22-須永寛紀-javadoc追記
+ * 2018/05/23-須永寛紀-例外処理追記
  *         </pre>
  */
 @Service
@@ -107,7 +108,7 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 				//12,POSTされた勤怠区分コードの情報を勤怠情報エンティティ「attendanceCd」として格納する。
 				tAttendance.setAttendanceCd("0");
 				//13,LINE APIを用いて「新しい{0}時刻(hhmm)を入力してください	」というテキストを送信する。
-				String msg = AppMesssageSource.getMessage("line.newAttendanceInput");											//{0}ってなんだ？
+				String msg = AppMesssageSource.getMessage("line.newAttendanceInput");
 				//LineAPIService.repryMessage(replyToken, msg);
 			} else if (text.equals("退勤")) {
 				//12,POSTされた勤怠区分コードの情報を勤怠情報エンティティ「attendanceCd」として格納する。
