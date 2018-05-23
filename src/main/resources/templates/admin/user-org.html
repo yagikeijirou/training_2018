@@ -11,79 +11,9 @@
 <link rel="stylesheet"
 	th:href="@{/lib/admin-lte/bower_components/select2/dist/css/select2.min.css}"
 	href="../../static/lib/admin-lte/bower_components/select2/dist/css/bootstrap.min.css" />
-</head>
-<body>
 
-	<!-- ヘッダー -->
-	<div class="ui container" layout:fragment="content" th:remove="tag">
-		<!-- Content Header (Page header) -->
-		<section class="content-header"></section>
-
-	</div>
-
-	<!-- 本文 -->
-	<div layout:fragment="script" th:remove="tag">
-		<!-- Select2 -->
-		<script
-			src="../../static/lib/admin-lte/bower_components/select2/dist/js/select2.min.js"
-			th:src="@{/lib/admin-lte/bower_components/select2/dist/js/select2.min.js}"></script>
-		<!-- JsRender -->
-		<script th:src="@{/lib/jsrender/jsrender.min.js}"
-			src="../../static/lib/jsrender/jsrender.min.js"></script>
-		<script th:src="@{/js/admin/user-org.js}"
-			src="../../static/js/admin/user-org.js"></script>
-
-
-		<!-- 組織表見出し -->
-		<h2>組織管理</h2>
-		<p>
-			<a class="btn btn-xs btn-info"
-				href="#" onclick="openRegisterOrg()"> <i
-					class="fa fa-plus"></i>
-			</a>
-		</p>
-		<tr>
-			<td class="vert-align col-md-4">組織コード</td>
-			<td class="vert-align col-md-9">組織名</td>
-		</tr>
-
-		<!-- 組織表 -->
-		<script id="org-list" type="text/x-jsrender">
-	</script>
-
-		<!-- ユーザ表見出し -->
-		<h2>ユーザ管理</h2>
-		<p>
-			<i class="fa fa-trash" onclick="deleteUsers()"></i> <i
-				class="fa fa-plus" onclick="openRegisterUser()"></i>
-		</p>
-		<tr>
-			<td class="vert-align col-md-1"><input type="checkbox"
-				id="userAllCheck" /></td>
-			<td class="vert-align col-md-2">ユーザID</td>
-			<td class="vert-align col-md-2">権限</td>
-			<td class="vert-align col-md-2">組織</td>
-			<td class="vert-align col-md-2">名前</td>
-			<td class="vert-align col-md-2">メールアドレス</td>
-			<td class="vert-align col-md-1"><a class="btn btn-xs btn-info"
-				href="#" onclick="openUpdateUser({{:userId}})"> <i
-					class="fa fa-pencil"></i>
-			</a></td>
-		</tr>
-
-		<!-- ユーザ表 -->
-		<script id="user-list" type="text/x-jsrender">
-	</script>
-
-
-
-
-
-
-
-
-		<!-- 組織表のテンプレ -->
-		<script id="org-record-tmpl" type="text/x-jsrender">
+<!-- 組織表のテンプレ -->
+	<script id="org-record-tmpl" type="text/x-jsrender">
         <tr class="clickable" onclick="findUser('{{:orgCd}}')">
             <td class="vert-align col-md-4">
                 {{:orgCd}}
@@ -100,10 +30,10 @@
                 <i class="fa fa-minus text-danger" onclick="handleDeleteOrg('{{:orgCd}}')"></i>
             </td>
         </tr>
-    </script>
+    	</script>
 
-		<!-- ユーザ表のテンプレ -->
-		<script id="user-record-tmpl" type="text/x-jsrender">
+	<!-- ユーザ表のテンプレ -->
+	<script id="user-record-tmpl" type="text/x-jsrender">
         <tr>
             <td class="vert-align col-md-1">
                 <input type="checkbox" name="userIds" value="{{:userId}}" class="checkUser"/>
@@ -129,7 +59,82 @@
                 </a>
             </td>
         </tr>
-    </script>
+    	</script>
+</head>
+<body>
+
+	<div class="ui container" layout:fragment="content" th:remove="tag">
+		<!-- Content Header (Page header) -->
+		<section class="content-header"></section>
+
+		<!-- 本文 -->
+		<div class="col-md-4">
+			<!-- 組織表見出し -->
+			<section class="content">
+				<div class="box box-default">
+					<div class="box-header with-border">
+						<h3 class="box-title">組織管理</h3>
+					</div>
+
+					<div class="box-body">
+						<a class="btn btn-s btn-info" href="#" onclick="openRegisterOrg()">
+							<i class="fa fa-plus"></i>
+						</a>
+					</div>
+					<div class="box-body">
+						<table class="table table-hover table-bordered">
+							<thead>
+								<tr>
+									<th>組織コード</th>
+									<th>組織名</th>
+								</tr>
+							</thead>
+							<tbody id="org-list">
+
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<div class="col-md-8">
+			<!-- ユーザ表見出し -->
+			<section class="content">
+				<div class="box box-default">
+					<div class="box-header with-border">
+						<h3 class="box-title">ユーザ管理</h3>
+					</div>
+					<div class="box-body">
+						<a class="btn btn-s btn-danger" href="#" onclick="handleDeleteUsers()">
+							<i class="fa fa-trash"></i>
+						</a> <a class="btn btn-s btn-info" href="#"
+							onclick="openRegisterUser()"> <i class="fa fa-plus"></i>
+						</a>
+					</div>
+					<div class="box-body">
+						<table class="table table-hover table-bordered">
+							<thead>
+								<tr>
+									<th><input type="checkbox" id="userAllCheck" /></th>
+									<th>ユーザID</th>
+									<th>権限</th>
+									<th>組織</th>
+									<th>名前</th>
+									<th>メール</th>
+								</tr>
+							</thead>
+							<tbody id="user-list">
+
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</section>
+		</div>
+
+
+
 	</div>
 
 	<!-- 組織モーダル(登録・更新) -->
@@ -144,13 +149,13 @@
 					<h4 class="modal-title">組織登録</h4>
 				</div>
 				<div>
-					組織コード <input type="text" id="org-cd"/>
+					組織コード <input type="text" id="org-cd" />
 				</div>
 				<div>
-					組織名 <input type="text" id="org-name"/>
+					組織名 <input type="text" id="org-name" />
 				</div>
 				<div>
-					表示順序 <input type="text" id="disp-seq"/>
+					表示順序 <input type="text" id="disp-seq" />
 				</div>
 				<div id="org-register-button">
 					<button type="button" onclick="handleRegisterOrg()">保存</button>
@@ -177,26 +182,20 @@
 					<h4 class="modal-title">ユーザ登録</h4>
 				</div>
 				<div>
-					ユーザID <input type="text" id="user-id"/>
+					ユーザID <input type="text" id="user-id" />
 				</div>
 				<div>
-					パスワード <input type="password" id="password"/>
+					パスワード <input type="password" id="password" />
 				</div>
 				<div>
-					名前 <input type="text" id="name"/>
+					名前 <input type="text" id="name" />
 				</div>
 				<div>
-					メールアドレス <input type="text" id="mail"/>
+					メールアドレス <input type="text" id="mail" />
 				</div>
-				<div id="user-org-cd">
-					組織
-				</div>
-				<div id="manager-id">
-					上司
-				</div>
-				<div id="auth-cd">
-					権限
-				</div>
+				<div id="user-org-cd">組織</div>
+				<div id="manager-id">上司</div>
+				<div id="auth-cd">権限</div>
 				<div id="org-register-button">
 					<button type="button" onclick="handleRegisterUser()">保存</button>
 				</div>
@@ -208,7 +207,28 @@
 				</div>
 			</div>
 		</div>
+
+
 	</div>
+
+
+
+
+
+
+	<div layout:fragment="script" th:remove="tag">
+		<!-- Select2 -->
+		<script
+			src="../../static/lib/admin-lte/bower_components/select2/dist/js/select2.min.js"
+			th:src="@{/lib/admin-lte/bower_components/select2/dist/js/select2.min.js}"></script>
+		<!-- JsRender -->
+		<script th:src="@{/lib/jsrender/jsrender.min.js}"
+			src="../../static/lib/jsrender/jsrender.min.js"></script>
+		<script th:src="@{/js/admin/user-org.js}"
+			src="../../static/js/admin/user-org.js"></script>
+	</div>
+
+
 
 </body>
 </html>
