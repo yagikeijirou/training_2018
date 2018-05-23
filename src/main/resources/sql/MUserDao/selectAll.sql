@@ -1,3 +1,4 @@
 SELECT *
  FROM m_user
-WHERE del_flg = '0'
+WHERE org_cd = ?
+AND del_flg = '0'
