@@ -157,11 +157,11 @@ public class UserService {
 	 * @param userIds 削除したいユーザのユーザIDリスト
 	 * @author 黄倉大輔
 	 * @author 菅一生
+	 * @throws NullPointerException 既に論理削除されているユーザを論理削除しようとした時
 	 */
 	public void deleteSomeUsers(List<Integer> userIds) {
-		// List<MUser> mUsersを全て論理削除する
-		//for (MUser eachUser : mUsers) {
-		//	muserDao.delete(eachUser);
-		//}
+		for (Integer eachId : userIds) {
+			muserDao.delete(muserDao.getByPk(eachId));
+		}
 	}
 }
