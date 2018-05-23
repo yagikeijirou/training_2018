@@ -1,8 +1,6 @@
 package application.dao;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,14 +21,14 @@ public class MUserDao extends AbstractDao<MUser> {
 	@Autowired
 	private SqlTemplate sqlTemplate;
 
-    /**
-     * PKでユーザ情報を取得する
-     * @param userId ユーザID
-     * @return ユーザエンティティ
-     */
-    public Optional<MUser> selectByPk(Integer userId) {
-        return Optional.ofNullable(sqlTemplate.forObject("sql/MUserDao/selectByPk.sql", MUser.class, userId));
-    }
+	/**
+	 * PKでユーザ情報を取得する
+	 * @param userId ユーザID
+	 * @return ユーザエンティティ
+	 */
+	public Optional<MUser> selectByPk(Integer userId) {
+		return Optional.ofNullable(sqlTemplate.forObject("sql/MUserDao/selectByPk.sql", MUser.class, userId));
+	}
 
 	/**
 	 * PKでユーザを取得する。
@@ -137,7 +135,6 @@ public class MUserDao extends AbstractDao<MUser> {
 		return sqlTemplate.forList("sql/MUserDao/selectAllByOrgCd.sql", MUser.class, orgCd);
 	}
 
-
 	/**
 	 * 権限コードから権限名を取得する。
 	 * @param authCd 権限コード
@@ -156,7 +153,6 @@ public class MUserDao extends AbstractDao<MUser> {
 			return "権限未設定";
 		}
 	}
-
 
 	/**
 	 * ユーザを新規登録する。
