@@ -179,7 +179,7 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		logger.debug("kashiwara()");
 
 
-		String lineId = "U242fce147b05106f3d5f31e7b82c7747";
+		String lineId = "testidBySumita";
 		String replyToken = "";
 
 		/*取得したLINE識別子からユーザを取得*/
@@ -206,6 +206,8 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		/*勤怠情報の勤怠時刻に既に出勤打刻が登録されていないか確認*/
 		if (t_attendance == null) {
 
+			t_attendance = new TAttendance();
+
 			/*勤怠情報のユーザIDに登録*/
 			t_attendance.setUserId(mUser.getUserId());
 
@@ -219,8 +221,9 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 			t_attendance.setAttendanceCd("01");
 
 			/*勤怠情報の修正フラグに0を登録*/
-			//t_attendance.setEditFlg("0");
+			t_attendance.setEditFlg("0");
 
+			System.out.println("勤怠情報は"+t_attendance);
 
 			/**勤怠情報エンティティをDBに新規登録*/
 			tAttendanceDao.insert(t_attendance);

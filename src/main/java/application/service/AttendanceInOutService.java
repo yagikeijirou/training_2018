@@ -65,6 +65,8 @@ public class AttendanceInOutService extends AbstractAttendanceService {
 		/*勤怠情報の勤怠時刻に既に出勤打刻が登録されていないか確認*/
 		if (t_attendance == null) {
 
+			t_attendance = new TAttendance();
+
 			/*勤怠情報のユーザIDに登録*/
 			t_attendance.setUserId(mUser.getUserId());
 
@@ -143,6 +145,7 @@ public class AttendanceInOutService extends AbstractAttendanceService {
 			/*勤怠情報の修正フラグに0を登録*/
 			//t_attendance.setEditFlg("0");
 
+			System.out.println("勤怠情報は"+t_attendance);
 
 			/**勤怠情報エンティティをDBに新規登録*/
 			tAttendanceDao.insert(t_attendance);
@@ -152,7 +155,6 @@ public class AttendanceInOutService extends AbstractAttendanceService {
 			//LineAPIService.repryMessage(replyToken, msg);
 
 			System.out.println("登録できました");
-
 		} else {
 			/*退勤時刻登録しないでエラーメッセージ表示する*/
 			String msg = AppMesssageSource.getMessage("line.api.err.savedClockOut");
