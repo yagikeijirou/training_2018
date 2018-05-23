@@ -8,6 +8,7 @@ INSERT INTO t_attendance (
   ,regist_func_cd
 ) VALUES (
   :userId
+ ,:attendanceCd
  ,:attendanceDay
  ,:attendanceTime
  ,:registDate

@@ -146,7 +146,7 @@ public class TAttendanceDao extends AbstractDao<TAttendance> {
 	 */
 	public int insert(TAttendance entity) {
 		setInsertColumns(entity);
-		return 0;
+		return sqlTemplate.update("sql/TAttendanceDao/insert.sql", entity);
 	}
 
 	/**
@@ -155,7 +155,7 @@ public class TAttendanceDao extends AbstractDao<TAttendance> {
 	 */
 	public int update(TAttendance entity) {
 		setUpdateColumns(entity);
-		return 0;
+		return sqlTemplate.update("sql/TAttendanceDao/update.sql", entity);
 	}
 
 }

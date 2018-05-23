@@ -74,7 +74,7 @@ public class AttendanceListService extends AbstractAttendanceService {
 			ym = text;
 			System.out.println("年月入力");
 
-		//リスト選択？
+			//リスト選択？
 		} else if (lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION)) {
 			user = mUserDao.getByPk(Integer.parseInt(text.split(" ")[0]));
 			ym = lineStatus.getContents();
@@ -99,7 +99,8 @@ public class AttendanceListService extends AbstractAttendanceService {
 		//一般・上司・管理者チェック
 		StringBuilder msg = new StringBuilder();
 
-		if (user.getAuthCd().equals("01") || (lineStatus.getActionName() !=null && lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION))) {
+		if (user.getAuthCd().equals("01") || (lineStatus.getActionName() != null
+				&& lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION))) {
 			//勤怠情報表示
 
 			//カレンダー
@@ -165,11 +166,10 @@ public class AttendanceListService extends AbstractAttendanceService {
 			System.out.println(msg.toString());
 			System.out.println("_____msgList_____");
 
-
 			//LINEステータス更新
 			lineStatus.setMenuCd("empty");
 			lineStatus.setActionName(null);
-			lineStatus.setContents(text);
+			lineStatus.setContents(null);
 			tLineStatusDao.save(lineStatus);
 
 			//メッセージの送信
@@ -177,12 +177,22 @@ public class AttendanceListService extends AbstractAttendanceService {
 		} else {
 			//上司・管理者の場合
 			//部下情報検索
-			List<MUser> junior = mUserDao.getByManagerId(user.getUserId());
+			List<MUser> junior;
+			if (user.getAuthCd().equals("01")) {
+				junior = mUserDao.getByManagerId(user.getUserId());
+			} else {
+				junior = mUserDao.getAll();
+			}
 
 			//テンプレートメッセージ作成
 			List<String> msgList = new ArrayList<String>();
-			for (MUser mu : junior) {
-				msgList.add(mu.getUserId().toString() + " " + mu.getName());
+			msgList.add(user.getUserId().toString() + " " + "自分");
+			if (junior != null) {
+				for (MUser mu : junior) {
+					if (!user.getUserId().equals(mu.getUserId())) {
+						msgList.add(mu.getUserId().toString() + " " + mu.getName());
+					}
+				}
 			}
 
 			//単体テスト用
