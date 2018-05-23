@@ -70,32 +70,40 @@ public class AttendanceInOutService extends AbstractAttendanceService {
 			/*勤怠情報のユーザIDに登録*/
 			t_attendance.setUserId(mUser.getUserId());
 
+			/*勤怠情報の勤怠区分コードに登録*/
+			t_attendance.setAttendanceCd("01");
+
 			/*勤怠情報の出勤日に登録*/
 			t_attendance.setAttendanceDay(reqtime);
 
 			/*リクエスト時刻を出勤時刻として登録する*/
 			t_attendance.setAttendanceTime(tLineStatus.getRequestTime());
 
-			/*勤怠情報の勤怠区分コードに登録*/
-			t_attendance.setAttendanceCd("01");
-
 			/*勤怠情報の修正フラグに0を登録*/
-			//t_attendance.setEditFlg("0");
+			t_attendance.setEditFlg("0");
 
+			System.out.println("勤怠情報は"+t_attendance);
 
 			/**勤怠情報エンティティをDBに新規登録*/
-			tAttendanceDao.insert(t_attendance);
+			tAttendanceDao.save(t_attendance);
+
+			System.out.println("勤怠情報は"+tAttendanceDao.getByPk(mUser.getUserId(), "01", reqtime));
+
+			if(tAttendanceDao.getByPk(mUser.getUserId(), "01", reqtime) != null) {
 
 			/*メッセージをLINEアプリ上で表示させて処理を終了する*/
 			String msg = AppMesssageSource.getMessage("line.arrival");
 			//LineAPIService.repryMessage(replyToken, msg);
 
 			System.out.println("登録できました");
+			}
+
 		} else {
 			/*出勤時刻登録しないでエラーメッセージ表示する*/
 			String msg = AppMesssageSource.getMessage("line.api.err.savedArrival");
 			//LineAPIService.repryMessage(replyToken, msg);
 
+			System.out.println("勤怠情報は"+tAttendanceDao.getByPk(mUser.getUserId(), "01", reqtime));
 			System.out.println("登録できませんでした");
 		}
 	}
@@ -130,6 +138,8 @@ public class AttendanceInOutService extends AbstractAttendanceService {
 		/*勤怠情報の勤怠時刻に既に出勤打刻が登録されていないか確認*/
 		if ((t_attendance == null)) {
 
+			t_attendance = new TAttendance();
+
 			/*勤怠情報のユーザIDに登録*/
 			t_attendance.setUserId(mUser.getUserId());
 
@@ -143,23 +153,33 @@ public class AttendanceInOutService extends AbstractAttendanceService {
 			t_attendance.setAttendanceCd("02");
 
 			/*勤怠情報の修正フラグに0を登録*/
-			//t_attendance.setEditFlg("0");
+			t_attendance.setEditFlg("0");
 
 			System.out.println("勤怠情報は"+t_attendance);
 
+			if(tAttendanceDao.getByPk(mUser.getUserId(), "01", reqtime) != null) {
 			/**勤怠情報エンティティをDBに新規登録*/
-			tAttendanceDao.insert(t_attendance);
+			tAttendanceDao.save(t_attendance);
+			}else {
+				/*出勤時刻登録をまだしていない場合*/
+			}
+
+			System.out.println("勤怠情報は"+tAttendanceDao.getByPk(mUser.getUserId(), "02", reqtime));
+
+			if(tAttendanceDao.getByPk(mUser.getUserId(), "02", reqtime) != null) {
 
 			/*メッセージをLINEアプリ上で表示させて処理を終了する*/
 			String msg = AppMesssageSource.getMessage("line.clockOut");
 			//LineAPIService.repryMessage(replyToken, msg);
 
 			System.out.println("登録できました");
+			}
 		} else {
 			/*退勤時刻登録しないでエラーメッセージ表示する*/
 			String msg = AppMesssageSource.getMessage("line.api.err.savedClockOut");
 			//LineAPIService.repryMessage(replyToken, msg);
 
+			System.out.println("勤怠情報は"+tAttendanceDao.getByPk(mUser.getUserId(), "02", reqtime));
 			System.out.println("登録できませんでした");
 		}
 	}

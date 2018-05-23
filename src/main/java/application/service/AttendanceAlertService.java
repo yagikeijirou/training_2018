@@ -61,13 +61,13 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		/** ユーザマスタの全ユーザのエンティティリスト **/
 		List<MUser> mu = mUserDao.getAll();
 		/** アラート出力用一時勤怠情報 **/
-		TAttendance tmpTa = null;
+		TAttendance tmpTa = new TAttendance();
 
 		// フラグが0ならここで終了、1なら続行
 		if (mSettingDao.get().getAlertFlag().equals("0")) {
-			System.out.println("★★★★★★★★★★★★★★★★★★★★★");
+			System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
 			System.out.println("打刻漏れ防止アラートが設定されていません。");
-			System.out.println("★★★★★★★★★★★★★★★★★★★★★");
+			System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
 			return 0;
 		}
 
@@ -91,23 +91,28 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 			if (alertMode == 1 && (tmpTa.getAttendanceCd().equals("02"))) {
 				// 最新勤怠情報が退勤 -> 出勤漏れ -> 出勤打刻漏れ防止アラート
 				//LineAPIService.pushMessage(eachUser.getLineId(), AppMesssageSource.getMessage("line.alertNotFoundAttendance", "出勤"));
-				System.out.println("★★★★★★★★★★★★★★★★★★★★★");
+				System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
 				System.out.println(AppMesssageSource.getMessage("line.alertNotFoundAttendance", "出勤"));
 				System.out.println("lineId: " + eachUser.getLineId());
-				System.out.println("★★★★★★★★★★★★★★★★★★★★★");
+				System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
+				// 送信カウンタを1増やす
+				alertCounter++;
 			} else if (alertMode == 2 && (tmpTa.getAttendanceCd().equals("01"))) {
 				// 最新勤怠情報が出勤 -> 退勤漏れ -> 退勤打刻漏れ防止アラート
 				//LineAPIService.pushMessage(eachUser.getLineId(), AppMesssageSource.getMessage("line.alertNotFoundAttendance", "退勤"));
-				System.out.println("★★★★★★★★★★★★★★★★★★★★★");
+				System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
 				System.out.println(AppMesssageSource.getMessage("line.alertNotFoundAttendance", "退勤"));
 				System.out.println("lineId: " + eachUser.getLineId());
-				System.out.println("★★★★★★★★★★★★★★★★★★★★★");
+				System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
+				// 送信カウンタを1増やす
+				alertCounter++;
 			}
 
-			// 送信カウンタを1増やす
-			alertCounter++;
-
 		}
+
+		System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
+		System.out.println("打刻漏れ防止アラートを " + alertCounter + "人 に送信しました。");
+		System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
 
 		return alertCounter;
 	}
@@ -136,7 +141,7 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		Date closeDate = CommonUtils.parseDate(CommonUtils.toYyyyMmDd() + closeTime + closeMinutes, "yyyyMMddHHmm");
 
 		// 日付確認用
-		/**
+		/*
 		System.out.println("- cron日付 -----------------");
 		System.out.println(beginTime);
 		System.out.println(endTime);
@@ -145,7 +150,7 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		System.out.println(CommonUtils.parseDate(CommonUtils.toYyyyMmDd() + openTime + openMinutes, "yyyyMMddHHmm"));
 		System.out.println(CommonUtils.parseDate(CommonUtils.toYyyyMmDd() + closeTime + closeMinutes, "yyyyMMddHHmm"));
 		System.out.println("----------------------------");
-		 **/
+		*/
 
 		// cron時刻範囲が出勤打刻漏れ防止アラート設定時刻を含むとき、return 1
 		if (openDate.after(beginTime) && openDate.before(endTime)) {
