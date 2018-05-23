@@ -44,9 +44,11 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 
 
 
-	/** 勤怠情報情報エンティティ。 */
-	@Autowired
-	private TAttendance tAttendance;
+//	/** 勤怠情報情報エンティティ。 */
+//	@Autowired
+//	private TAttendance tAttendance;
+
+	private TAttendance tAttendance = null;
 
 	//1,LINEステータス情報を検索する。
 	//2,メニューコードとアクション名が適切か確認する。
