@@ -62,7 +62,7 @@ public class UserService {
      * @return Map<String,Object> ユーザ情報リスト
      */
     public Map<String, Object> getUser(String orgCd) {
-    	List<MUser> mUsers = muserDao.getAll();
+    	List<MUser> mUsers = muserDao.getAllUserByOrgCd(orgCd);
 		Map<String, Object> map2 = new HashMap<String, Object>();
 		MOrg mOrg = morgDao.getByPk(orgCd);
 		int i = 0;
@@ -153,11 +153,15 @@ public class UserService {
 	}
 
 	/**
-	 * ユーザを削除する。
-	 * @param mUser ユーザマスタエンティティ
+	 * 指定されたユーザIDについて、ユーザマスタから論理削除する。
+	 * @param userIds 削除したいユーザのユーザIDリスト
 	 * @author 黄倉大輔
+	 * @author 菅一生
 	 */
-	public void deleteUser(MUser mUser) {
-		muserDao.delete(mUser);
+	public void deleteSomeUsers(List<Integer> userIds) {
+		// List<MUser> mUsersを全て論理削除する
+		//for (MUser eachUser : mUsers) {
+		//	muserDao.delete(eachUser);
+		//}
 	}
 }

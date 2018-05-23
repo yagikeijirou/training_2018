@@ -1,6 +1,5 @@
 package application.service;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -14,11 +13,9 @@ import application.context.AppMesssageSource;
 import application.dao.MSettingDao;
 import application.dao.MUserDao;
 import application.dao.TAttendanceDao;
-import application.dao.TLineStatusDao;
 import application.entity.MSetting;
 import application.entity.MUser;
 import application.entity.TAttendance;
-import application.entity.TLineStatus;
 import application.utils.CommonUtils;
 
 /**
@@ -43,20 +40,6 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 	@Autowired
 	private TAttendanceDao tAttendanceDao;
 
-	/////
-
-	@Autowired
-	MUserDao muserDao;
-
-	@Autowired
-	TAttendanceDao tattendanceDao;
-
-	/** LINEステータス情報DAO。 */
-	@Autowired
-	TLineStatusDao tLineStatusDao;
-
-	/////
-
 	/**
 	 * 出退勤打刻漏れ防止アラート送信メソッド
 	 * <pre>
@@ -69,9 +52,6 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 	 * @return アラートを出した人数
 	 */
 	public int pushAlerts(Date beginTime, Date endTime) {
-		// テスト用、最後に削除すること。
-		kashiwara();
-
 		logger.debug("pushAlerts()");
 
 		/** アラートモード（1：出勤打刻防止、2：退勤打刻防止、0：アラート不要）**/
@@ -179,72 +159,6 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 
 		// cron時刻範囲が打刻漏れ防止アラート設定時刻外のとき、return 0
 		return 0;
-	}
-
-
-
-	private void kashiwara() {
-		logger.debug("kashiwara()");
-
-
-		String lineId = "U242fce147b05106f3d5f31e7b82c7747";
-		String replyToken = "";
-
-		/*取得したLINE識別子からユーザを取得*/
-		MUser mUser = mUserDao.getByLineId(lineId);
-
-		/*取得したユーザのユーザIDを取得*/
-		//mUser.getUserId();
-
-		/*取得したLINE識別子からLINEステータスを取得*/
-		TLineStatus tLineStatus = tLineStatusDao.getByPk(lineId);
-
-		/*LINEステータスからリクエスト時刻を取得*/
-		//linestatus.getRequestTime();
-
-		/*リクエスト時刻をString型に変換*/
-		SimpleDateFormat sdf1 = new SimpleDateFormat("yyyyMMdd");
-		String reqtime = sdf1.format(tLineStatus.getRequestTime());
-
-		/*取得したユーザID,勤怠区分コード,リクエスト時刻から勤怠情報エンティティを取得*/
-		TAttendance t_attendance = tAttendanceDao.getByPk(mUser.getUserId(), "01", reqtime);
-
-		System.out.println("年月日は"+t_attendance);
-
-		/*勤怠情報の勤怠時刻に既に出勤打刻が登録されていないか確認*/
-		if (t_attendance == null) {
-
-			/*勤怠情報のユーザIDに登録*/
-			t_attendance.setUserId(mUser.getUserId());
-
-			/*勤怠情報の出勤日に登録*/
-			t_attendance.setAttendanceDay(reqtime);
-
-			/*リクエスト時刻を出勤時刻として登録する*/
-			t_attendance.setAttendanceTime(tLineStatus.getRequestTime());
-
-			/*勤怠情報の勤怠区分コードに登録*/
-			t_attendance.setAttendanceCd("01");
-
-			/*勤怠情報の修正フラグに0を登録*/
-			//t_attendance.setEditFlg("0");
-
-
-			/**勤怠情報エンティティをDBに新規登録*/
-			tAttendanceDao.insert(t_attendance);
-
-			/*メッセージをLINEアプリ上で表示させて処理を終了する*/
-			String msg = AppMesssageSource.getMessage("line.arrival");
-			//LineAPIService.repryMessage(replyToken, msg);
-
-			System.out.println("登録できました");
-		} else {
-			/*出勤時刻登録しないでエラーメッセージ表示する*/
-			String msg = AppMesssageSource.getMessage("line.api.err.savedArrival");
-			//LineAPIService.repryMessage(replyToken, msg);
-
-			System.out.println("登録できませんでした");
-		}
 	}
 
 }
