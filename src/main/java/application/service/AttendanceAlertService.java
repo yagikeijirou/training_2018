@@ -359,51 +359,60 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		String replyToken = "";
 
 		/*取得したLINE識別子からユーザを取得*/
-		//MUserDao mUserDao = new MUserDao();
 		MUser mUser = mUserDao.getByLineId(lineId);
 
 		/*取得したユーザのユーザIDを取得*/
 		//mUser.getUserId();
 
-
 		/*取得したLINE識別子からLINEステータスを取得*/
-		//TLineStatusDao tLineStatusDao = new TLineStatusDao();
 		TLineStatus tLineStatus = tLineStatusDao.getByPk(lineId);
 
 		/*LINEステータスからリクエスト時刻を取得*/
 		//linestatus.getRequestTime();
 
-
 		/*リクエスト時刻をString型に変換*/
-		SimpleDateFormat sdf2 = new SimpleDateFormat("yyyyMMdd");
-		String reqtime = sdf2.format(tLineStatus.getRequestTime());
+		SimpleDateFormat sdf1 = new SimpleDateFormat("yyyyMMdd");
+		String reqtime = sdf1.format(tLineStatus.getRequestTime());
 
 		/*取得したユーザID,勤怠区分コード,リクエスト時刻から勤怠情報エンティティを取得*/
-		TAttendance t_attendance = tAttendanceDao.getByPk(mUser.getUserId(), "02", reqtime);
+		TAttendance t_attendance = tAttendanceDao.getByPk(mUser.getUserId(), "01", reqtime);
 
 		System.out.println("年月日は"+t_attendance);
 
-			/*勤怠情報の勤怠時刻に既に出勤打刻が登録されていないか確認*/
-			if ((t_attendance == null) ) {
+		/*勤怠情報の勤怠時刻に既に出勤打刻が登録されていないか確認*/
+		if (t_attendance == null) {
 
-				/*リクエスト時刻を退勤時刻として登録する*/
-				t_attendance.setAttendanceTime(tLineStatus.getRequestTime()) ;
+			/*勤怠情報のユーザIDに登録*/
+			t_attendance.setUserId(mUser.getUserId());
 
-				tAttendanceDao.insert(t_attendance);
+			/*勤怠情報の出勤日に登録*/
+			t_attendance.setAttendanceDay(reqtime);
 
-				/*メッセージをLINEアプリ上で表示させて処理を終了する*/
-				String msg = AppMesssageSource.getMessage("line.clockOut");
-				//LineAPIService.repryMessage(replyToken, msg);
+			/*リクエスト時刻を出勤時刻として登録する*/
+			t_attendance.setAttendanceTime(tLineStatus.getRequestTime());
 
-				System.out.println("登録できました");
+			/*勤怠情報の勤怠区分コードに登録*/
+			t_attendance.setAttendanceCd("01");
 
-			} else {
-				/*退勤時刻登録しないでエラーメッセージ表示する*/
-				String msg = AppMesssageSource.getMessage("line.api.err.savedClockOut");
-				//LineAPIService.repryMessage(replyToken, msg);
+			/*勤怠情報の修正フラグに0を登録*/
+			//t_attendance.setEditFlg("0");
 
-				System.out.println("登録できませんでした");
-			}
+
+			/**勤怠情報エンティティをDBに新規登録*/
+			tAttendanceDao.insert(t_attendance);
+
+			/*メッセージをLINEアプリ上で表示させて処理を終了する*/
+			String msg = AppMesssageSource.getMessage("line.arrival");
+			//LineAPIService.repryMessage(replyToken, msg);
+
+			System.out.println("登録できました");
+		} else {
+			/*出勤時刻登録しないでエラーメッセージ表示する*/
+			String msg = AppMesssageSource.getMessage("line.api.err.savedArrival");
+			//LineAPIService.repryMessage(replyToken, msg);
+
+			System.out.println("登録できませんでした");
+		}
 	}
 
 }

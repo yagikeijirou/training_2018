@@ -65,9 +65,23 @@ public class AttendanceInOutService extends AbstractAttendanceService {
 		/*勤怠情報の勤怠時刻に既に出勤打刻が登録されていないか確認*/
 		if (t_attendance == null) {
 
+			/*勤怠情報のユーザIDに登録*/
+			t_attendance.setUserId(mUser.getUserId());
+
+			/*勤怠情報の出勤日に登録*/
+			t_attendance.setAttendanceDay(reqtime);
+
 			/*リクエスト時刻を出勤時刻として登録する*/
 			t_attendance.setAttendanceTime(tLineStatus.getRequestTime());
 
+			/*勤怠情報の勤怠区分コードに登録*/
+			t_attendance.setAttendanceCd("01");
+
+			/*勤怠情報の修正フラグに0を登録*/
+			//t_attendance.setEditFlg("0");
+
+
+			/**勤怠情報エンティティをDBに新規登録*/
 			tAttendanceDao.insert(t_attendance);
 
 			/*メッセージをLINEアプリ上で表示させて処理を終了する*/
@@ -114,9 +128,23 @@ public class AttendanceInOutService extends AbstractAttendanceService {
 		/*勤怠情報の勤怠時刻に既に出勤打刻が登録されていないか確認*/
 		if ((t_attendance == null)) {
 
-			/*リクエスト時刻を退勤時刻として登録する*/
+			/*勤怠情報のユーザIDに登録*/
+			t_attendance.setUserId(mUser.getUserId());
+
+			/*勤怠情報の出勤日に登録*/
+			t_attendance.setAttendanceDay(reqtime);
+
+			/*リクエスト時刻を出勤時刻として登録する*/
 			t_attendance.setAttendanceTime(tLineStatus.getRequestTime());
 
+			/*勤怠情報の勤怠区分コードに登録*/
+			t_attendance.setAttendanceCd("02");
+
+			/*勤怠情報の修正フラグに0を登録*/
+			//t_attendance.setEditFlg("0");
+
+
+			/**勤怠情報エンティティをDBに新規登録*/
 			tAttendanceDao.insert(t_attendance);
 
 			/*メッセージをLINEアプリ上で表示させて処理を終了する*/
