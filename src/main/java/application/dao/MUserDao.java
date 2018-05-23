@@ -133,12 +133,10 @@ public class MUserDao extends AbstractDao<MUser> {
 	 * 組織コードから全てのユーザを取り出す。
 	 * @param orgCd 組織コード
 	 * @return ユーザエンティティリスト
-	 * @author 菅一生
+	 * @author 黄倉大輔
 	 */
 	public List<MUser> getAllUserByOrgCd(String orgCd) {
-		Map<String, Object> cond = new HashMap<>();
-		cond.put("orgCd", orgCd);
-		return sqlTemplate.forList("sql/MUserDao/selectAll.sql", MUser.class, cond);
+		return sqlTemplate.forList("sql/MUserDao/selectAllByOrgCd.sql", MUser.class, orgCd);
 	}
 
 
