@@ -3,6 +3,7 @@ package application.service;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -63,21 +64,31 @@ public class AttendanceListService extends AbstractAttendanceService {
 	 */
 	public void listAction(String lineId, String replyToken, TLineStatus lineStatus, String text) {
 
-		//ユーザマスタ検索
+		//ユーザマスタ
 		MUser user = null;
+
+		//年月
 		String ym = null;
+
+		//修正フラグ
+		boolean editFlg;
 
 		//年月入力？
 		if (Pattern.compile("^[0-9]{4}/[01]*[0-9]").matcher(text).find()) {
 			user = mUserDao.getByLineId(lineId);
 			ym = text;
 
-			//リスト選択？
+		//リスト選択？
 		} else if (lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION)) {
 			user = mUserDao.getByPk(Integer.parseInt(text.split(" ")[0]));
+			if(user==null) {
+				LineAPIService.repryMessage(replyToken, AppMesssageSource.getMessage("入力に誤りがある可能性があります。"));
+				return;
+			}
 			ym = lineStatus.getContents();
+
 		} else {
-			LineAPIService.repryMessage(replyToken, AppMesssageSource.getMessage("line.api.err.userNotExists"));
+			LineAPIService.repryMessage(replyToken, AppMesssageSource.getMessage("入力に誤りがある可能性があります。"));
 			return;
 		}
 
@@ -86,15 +97,14 @@ public class AttendanceListService extends AbstractAttendanceService {
 			return;
 		}
 
-		//修正フラグ
-		boolean editFlg;
-
 		if (user.getAuthCd().equals("01") || (lineStatus.getActionName() != null
 				&& lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION))) {
-			//勤怠情報表示
 
-			//文字列型の勤怠情報
+			//勤怠情報
 			StringBuilder msg = new StringBuilder();
+
+			//出勤、退勤情報
+			TAttendance arrival_t, clock_out_t;
 
 			//カレンダー
 			Calendar cal = Calendar.getInstance();
@@ -102,11 +112,9 @@ public class AttendanceListService extends AbstractAttendanceService {
 			cal.set(Calendar.MONTH, Integer.parseInt(ym.split("/")[1]));
 			int lastDayOfMonth = cal.getActualMaximum(Calendar.DATE);
 
-			//時刻フォーマット
+			//フォーマット
 			SimpleDateFormat sdf = new SimpleDateFormat("hh:mm");
-
-			//出勤、退勤情報
-			TAttendance arrival_t, clock_out_t;
+			SimpleDateFormat sdf2 = new SimpleDateFormat("E");
 
 			//メッセージ作成(mm/dd(D) hh:mm ~ hh:mm #{"修正"}||#{""})
 			for (int i = 1; i <= lastDayOfMonth; i++) {
@@ -121,7 +129,7 @@ public class AttendanceListService extends AbstractAttendanceService {
 				msg.append(String.format("%02d", i));
 				msg.append("(");
 				cal.set(Calendar.DATE, i);
-				msg.append(new SimpleDateFormat("E").format(cal.getTime()));
+				msg.append(sdf2.format(cal.getTime()));
 				msg.append(") ");
 
 				if (arrival_t != null && clock_out_t != null) {
@@ -154,21 +162,18 @@ public class AttendanceListService extends AbstractAttendanceService {
 				msg.append(System.getProperty("line.separator"));
 			}
 
-			//単体テスト用
-//			System.out.println("_____msgList_____");
-//			System.out.println(msg.toString());
-//			System.out.println("_____msgList_____");
-
 			//LINEステータス更新
 			lineStatus.setMenuCd("empty");
 			lineStatus.setActionName(null);
 			lineStatus.setContents(null);
+			lineStatus.setRequestTime(new Date());
+			logger.debug("saveLineSutatus() {}", lineStatus);
 			tLineStatusDao.save(lineStatus);
 
 			//メッセージの送信
 			LineAPIService.repryMessage(replyToken, msg.toString());
 		} else {
-			//上司・管理者の場合
+
 			//部下情報検索
 			List<MUser> junior;
 			if (user.getAuthCd().equals("02")) {
@@ -188,14 +193,11 @@ public class AttendanceListService extends AbstractAttendanceService {
 				}
 			}
 
-			//単体テスト用
-//			System.out.println("_____msgList_____");
-//			System.out.println(msgList.toString());
-//			System.out.println("_____msgList_____");
-
 			//LINEステータス更新
 			lineStatus.setActionName(ACTION_LIST_USER_SELECTION);
 			lineStatus.setContents(text);
+			lineStatus.setRequestTime(new Date());
+			logger.debug("saveLineSutatus() {}", lineStatus);
 			tLineStatusDao.save(lineStatus);
 
 			//テンプレートメッセージ送信
