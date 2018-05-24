@@ -14,6 +14,7 @@ import application.context.AppMesssageSource;
 import application.dao.MSettingDao;
 import application.dao.MUserDao;
 import application.dao.TAttendanceDao;
+import application.emuns.AttenanceCd;
 import application.entity.MSetting;
 import application.entity.MUser;
 import application.entity.TAttendance;
@@ -58,7 +59,8 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		/** beginTimeをCalendar型で持つための変数 **/
 		Calendar beginCl = Calendar.getInstance();
 		beginCl.setTime(beginTime);
-		/** アラートモード（1：出勤打刻防止、2：退勤打刻防止、0：アラート不要）**/
+
+		/** アラートモード（1：出勤打刻防止、2：退勤打刻防止、0：アラート不要 **/
 		int alertMode = 0;
 		/** アラートを出した人の数 **/
 		int alertCounter = 0;
@@ -90,37 +92,41 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 			System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
 			System.out.println("打刻漏れ防止アラートを出す時刻ではありません。");
 			System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
-			return 0;
+			return -3;
 		}
 
 		// ユーザマスタにある全ユーザのリストがmuList、その1つをeachUserに入れてそれぞれ処理
 		for (MUser eachUser : muList) {
-			tmpTa = tAttendanceDao.getLatestOneByUserId(eachUser.getUserId());
 
-			// XXX: 指定ユーザの勤怠情報が未登録の時、次のユーザへ進む
-			// TODO: この時、出退どちらもアラート出す
-			if (tmpTa == null) {
-				continue;
+			// 出勤アラートを出すとき
+			if (alertMode == 1) {
+				tmpTa = tAttendanceDao.getByPk(eachUser.getUserId(), AttenanceCd.getByName("出勤").getCode(),
+						CommonUtils.toYyyyMmDd(beginTime));
+				if (tmpTa == null) {
+					//LineAPIService.pushMessage(eachUser.getLineId(), AppMesssageSource.getMessage("line.alertNotFoundAttendance", "出勤"));
+					System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
+					System.out.println(AppMesssageSource.getMessage("line.alertNotFoundAttendance", "出勤"));
+					System.out.println("lineId: " + eachUser.getLineId());
+					System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
+					// 送信カウンタを1増やす
+					alertCounter++;
+				}
 			}
 
-			if (alertMode == 1 && (tmpTa.getAttendanceCd().equals("02"))) {
-				// 最新勤怠情報が退勤 -> 出勤漏れ -> 出勤打刻漏れ防止アラート
-				//LineAPIService.pushMessage(eachUser.getLineId(), AppMesssageSource.getMessage("line.alertNotFoundAttendance", "出勤"));
-				System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
-				System.out.println(AppMesssageSource.getMessage("line.alertNotFoundAttendance", "出勤"));
-				System.out.println("lineId: " + eachUser.getLineId());
-				System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
-				// 送信カウンタを1増やす
-				alertCounter++;
-			} else if (alertMode == 2 && (tmpTa.getAttendanceCd().equals("01"))) {
-				// 最新勤怠情報が出勤 -> 退勤漏れ -> 退勤打刻漏れ防止アラート
-				//LineAPIService.pushMessage(eachUser.getLineId(), AppMesssageSource.getMessage("line.alertNotFoundAttendance", "退勤"));
-				System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
-				System.out.println(AppMesssageSource.getMessage("line.alertNotFoundAttendance", "退勤"));
-				System.out.println("lineId: " + eachUser.getLineId());
-				System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
-				// 送信カウンタを1増やす
-				alertCounter++;
+			// 退勤アラートを出すとき
+			else if (alertMode == 2) {
+				tmpTa = tAttendanceDao.getByPk(eachUser.getUserId(), AttenanceCd.getByName("退勤").getCode(),
+						CommonUtils.toYyyyMmDd(beginTime));
+				if (tmpTa == null) {
+					// 最新勤怠情報が出勤 -> 退勤漏れ -> 退勤打刻漏れ防止アラート
+					//LineAPIService.pushMessage(eachUser.getLineId(), AppMesssageSource.getMessage("line.alertNotFoundAttendance", "退勤"));
+					System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
+					System.out.println(AppMesssageSource.getMessage("line.alertNotFoundAttendance", "退勤"));
+					System.out.println("lineId: " + eachUser.getLineId());
+					System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
+					// 送信カウンタを1増やす
+					alertCounter++;
+				}
 			}
 
 		}
