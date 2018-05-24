@@ -1,5 +1,6 @@
 package application.service;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -49,29 +50,42 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 	 *
 	 * @param beginTime ある時間範囲の開始時刻
 	 * @param endTime ある時間範囲の終了時刻
-	 * @return アラートを出した人数
+	 * @return 0以上の場合、アラートを出した人数。0未満の場合、終了コード。
 	 */
 	public int pushAlerts(Date beginTime, Date endTime) {
 		logger.debug("pushAlerts()");
 
+		/** beginTimeをCalendar型で持つための変数 **/
+		Calendar beginCl = Calendar.getInstance();
+		beginCl.setTime(beginTime);
 		/** アラートモード（1：出勤打刻防止、2：退勤打刻防止、0：アラート不要）**/
 		int alertMode = 0;
 		/** アラートを出した人の数 **/
 		int alertCounter = 0;
+		/** 設定マスタのエンティティ **/
+		MSetting ms = mSettingDao.get();
 		/** ユーザマスタの全ユーザのエンティティリスト **/
-		List<MUser> mu = mUserDao.getAll();
+		List<MUser> muList = mUserDao.getAll();
 		/** アラート出力用一時勤怠情報 **/
 		TAttendance tmpTa = new TAttendance();
 
-		// フラグが0ならここで終了、1なら続行
-		if (mSettingDao.get().getAlertFlag().equals("0")) {
+		// アラートフラグがアラートなしならここで終了、アラートありなら続行
+		if (ms.getAlertFlag().equals("0")) {
 			System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
 			System.out.println("打刻漏れ防止アラートが設定されていません。");
 			System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
-			return 0;
+			return -1;
 		}
 
-		// 今がアラートを出すときではないならここで終了、出すときなら続行
+		// 本日が営業日じゃないならここで終了、営業日なら続行
+		if (!getBusinessDay(ms).contains(beginCl.get(Calendar.DAY_OF_WEEK))) {
+			System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
+			System.out.println("本日は営業日ではありません。");
+			System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
+			return -2;
+		}
+
+		// 今がアラートを出す時間ではないならここで終了、出す時間なら、出退どちらのアラートかを保持し続行
 		if ((alertMode = alertModeChecker(beginTime, endTime)) == 0) {
 			System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
 			System.out.println("打刻漏れ防止アラートを出す時刻ではありません。");
@@ -79,11 +93,12 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 			return 0;
 		}
 
-		// ユーザマスタにある全ユーザのリストがmu、その1つをeachUserに入れてそれぞれ処理
-		for (MUser eachUser : mu) {
+		// ユーザマスタにある全ユーザのリストがmuList、その1つをeachUserに入れてそれぞれ処理
+		for (MUser eachUser : muList) {
 			tmpTa = tAttendanceDao.getLatestOneByUserId(eachUser.getUserId());
 
-			// 指定ユーザの勤怠情報が未登録の時、次のユーザへ進む
+			// XXX: 指定ユーザの勤怠情報が未登録の時、次のユーザへ進む
+			// TODO: この時、出退どちらもアラート出す
 			if (tmpTa == null) {
 				continue;
 			}
