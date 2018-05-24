@@ -9,31 +9,9 @@
 <link rel="stylesheet" type="text/css"
 	th:href="@{/lib/admin-lte/plugins/timepicker/bootstrap-timepicker.min.css}"
 	href="../../static/lib/admin-lte/plugins/timepicker/bootstrap-timepicker.min.css" />
+
 </head>
-<head>
-<script type="text/javascript">
-	function pDate() {
-		alert('foo');
-	}
-	/*var btn = document.getElementById('year-montht');
-	btn.addEventListener('load', function(e) {
-		alert('foo');
-	}, false);
 
-	document.getElementId('year-montht').onload = function() {
-
-		var ND, YY, MM, outData;
-
-		ND = new Date();
-
-		YY = ND.getFullYear();
-		MM = ND.getMonth() + 1;
-
-		//document.myFORM.date.value = m + "月" + d + "日";
-		return m + "月" + d + "日";
-	}*/
-</script>
-</head>
 
 
 <body>
@@ -50,14 +28,19 @@
 					<div class="box-header with-border">
 						<h3 class="box-title">リスト出力</h3>
 					</div>
+					<div class="box-body">
 
-					<input id="yearMonthPicker" type="month"
-						class="form-control date" onLoad="pDate()" name="outputYearMonth"
-						required="required" />
-				<div class="pull-right">
-					<button type="submit" name="action" value="confirm" form = "outputYearMonth"
-						class="btn btn-primary" >出力</button>
-				</div>
+						<div class="col-md-2">
+							<input id="yearMonthPicker" type="month"
+								class="form-control date" style="width: 170px" name="outputYearMonth"
+								required="required" />
+						</div>
+
+						<div class="col-md-1">
+							<button type="submit" name="action" value="confirm"
+								form="outputYearMonth" class="btn btn-primary">出力</button>
+						</div>
+					</div>
 				</form>
 			</div>
 		</section>

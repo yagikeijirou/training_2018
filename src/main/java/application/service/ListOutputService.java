@@ -6,9 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
 import application.dao.MUserDao;
 import application.dao.TAttendanceDao;
 import application.entity.MUser;
@@ -23,97 +20,106 @@ import application.utils.CommonUtils;
  */
 @Service
 @Transactional
-@JsonPropertyOrder({ "id", "name", "date", "arrival", "clock-out" })
+
 public class ListOutputService {
 
+	/** 勤怠情報用DAO **/
 	@Autowired
 	TAttendanceDao tattendancedao;
 
+	/** ユーザマスタ用DAO **/
 	@Autowired
 	MUserDao muserdao;
 
-	@JsonProperty("id")
+	/** ユーザID */
 	private Integer id;
 
-	@JsonProperty("name")
+	/** ユーザ氏名 */
 	private String name;
 
-	@JsonProperty("date")
+	/** 出勤日(dd) */
 	private String date;
 
-	@JsonProperty("arrival")
+	/** 出勤時刻(H:mm) */
 	private String arrival;
 
-	@JsonProperty("clock-out")
+	/** 退勤時刻(H:mm) */
 	private String clockout;
 
+/**
+ * 勤怠情報をCSV形式に変換するメソッド
+ *
+ * @param outputYearMonth 出力年月（yyyyMM）
+ * @return String CSV形式の勤怠情報
+ */
 	public String csvDownload(String outputYearMonth) {
 
-		//データベースに接続する
-		//SQLを発行する
-		//勤怠情報：ユーザID
-		//ユーザマスタ：ユーザ氏名
-		//勤怠情報：出勤日
-		//勤怠情報：勤怠区分コード
-		//勤怠情報：勤怠時刻
-		System.out.println(CommonUtils.toYearMonth(outputYearMonth));
-
+		//勤怠情報から出力年月ですべての勤怠情報を取得する
 		List<TAttendance> tattendances = tattendancedao.getByAttendanceMonth(CommonUtils.toYearMonth(outputYearMonth));
 
-		System.out.print(tattendances.toString());
+		//文字列を格納するオブジェクトの作成
 		StringBuilder sb = new StringBuilder();
-		MUser user;
 
-					sb.append("id");
-		    sb.append(",");
-		    sb.append("name");
-		    sb.append(",");
-		    sb.append("date");
-		    sb.append(",");
-		    sb.append("arrival");
-		    sb.append(",");
-		    sb.append("clock-out");
-		    sb.append("\r\n");
+		//ヘッダーを設定する
+		sb.append("id");
+		sb.append(",");
+		sb.append("name");
+		sb.append(",");
+		sb.append("date");
+		sb.append(",");
+		sb.append("arrival");
+		sb.append(",");
+		sb.append("clock-out");
+		sb.append("\r\n");
 
+		//勤怠情報を取得する
 		for (TAttendance ta : tattendances) {
 
-
+			//勤怠情報からユーザIDを取得する
 			id = ta.getUserId();
+
+			//ユーザマスタからユーザIDでユーザを取得する
+			MUser user;
 			user = muserdao.getByPk(id);
-			if(user == null) {
+
+			//ユーザIDがない場合は出力しない
+			if (user == null) {
 				continue;
 			}
-
+			//ユーザからユーザ氏名を取得する
 			name = user.getName();
 
+			//勤怠情報の出勤日から日付のみを取得する
 			date = ta.getAttendanceDay();
 			date = date.substring(6);
+
+			//勤怠情報から時刻を任意の形式で取得する
 			String time = CommonUtils.toHMm(ta.getAttendanceTime());
 
+			//勤怠情報から勤怠区分コードを取得する
 			String code = ta.getAttendanceCd();
+
+			//勤怠区分コードに応じてarruvalかclockoutか判断する
 			arrival = "";
 			clockout = "";
-
 			if (code.equals("01")) {
 				arrival = time;
 			} else {
 				clockout = time;
 			}
-
-		    sb.append(id);
-		    sb.append(",");
-		    sb.append(name);
-		    sb.append(",");
-		    sb.append(date);
-		    sb.append(",");
-		    sb.append(arrival);
-		    sb.append(",");
-		    sb.append(clockout);
-		    sb.append("\r\n");
-
-			System.out.println(sb);
-
+			//CSV形式の文字列をつくる
+			sb.append(id);
+			sb.append(",");
+			sb.append(name);
+			sb.append(",");
+			sb.append(date);
+			sb.append(",");
+			sb.append(arrival);
+			sb.append(",");
+			sb.append(clockout);
+			sb.append("\r\n");
 		}
+		//文字列を返す
 		return new String(sb);
 	}
 }
