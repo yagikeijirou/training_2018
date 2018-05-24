@@ -143,11 +143,11 @@ public class MUserDao extends AbstractDao<MUser> {
 	 */
 	public String getAuthNameByAuthCd(String authCd) {
 		switch (authCd) {
-		case "1":
+		case "01":
 			return "一般";
-		case "2":
+		case "02":
 			return "上長";
-		case "3":
+		case "03":
 			return "管理者";
 		default:
 			return "権限未設定";

@@ -1,5 +1,6 @@
 package application.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import application.dao.MOrgDao;
 import application.dao.MUserDao;
+import application.dto.UserInfoDto;
 import application.entity.MOrg;
 import application.entity.MUser;
 
@@ -39,46 +41,78 @@ public class UserService {
 	 * @return Map<String,Object> ユーザ情報リスト
 	 */
 	public Map<String, Object> getUserMapByUserId(Integer userId) {
-		MUser mUser = muserDao.getByPk(userId);//ユーザIDからユーザエンティティを取得
-		MOrg mOrg = morgDao.getByPk(mUser.getOrgCd());//組織コードから所属している組織エンティティを取得
-		MUser manager = muserDao.getByPk(mUser.getManagerId());//上司IDから上司のエンティティを取得
+		//		MUser mUser = muserDao.getByPk(userId);//ユーザIDからユーザエンティティを取得
+		//		MOrg mOrg = morgDao.getByPk(mUser.getOrgCd());//組織コードから所属している組織エンティティを取得
+		//		MUser manager = muserDao.getByPk(mUser.getManagerId());//上司IDから上司のエンティティを取得
+		//
+		//		Map<String, Object> map = new HashMap<>();
+		//		map.put("userId", mUser.getUserId());
+		//		map.put("name", mUser.getName());
+		//		map.put("mail", mUser.getMail());
+		//		map.put("orgCd", mUser.getOrgCd());
+		//		map.put("orgName", mOrg.getOrgName());//組織名
+		//		map.put("authCd", mUser.getAuthCd());
+		//		map.put("authName", muserDao.getAuthNameByAuthCd(mUser.getAuthCd()));//権限名
+		//		map.put("managerId", mUser.getManagerId());
+		//		map.put("managerName", manager.getName());//上司名
+		//		return map;
 
+		MUser mUser = muserDao.getByPk(userId);
+		MOrg mOrg = morgDao.getByPk(mUser.getOrgCd());
+		MUser manager = muserDao.getByPk(mUser.getManagerId());
 		Map<String, Object> map = new HashMap<>();
-		map.put("userId", mUser.getUserId());
-		map.put("name", mUser.getName());
-		map.put("mail", mUser.getMail());
-		map.put("orgCd", mUser.getOrgCd());
-		map.put("orgName", mOrg.getOrgName());//組織名
-		map.put("authCd", mUser.getAuthCd());
-		map.put("authName", muserDao.getAuthNameByAuthCd(mUser.getAuthCd()));//権限名
-		map.put("managerId", mUser.getManagerId());
-		map.put("managerName", manager.getName());//上司名
+
+		map.put("results", mUser);
+		map.put("orgName", mOrg.getOrgName());
+		map.put("authName", muserDao.getAuthNameByAuthCd(mUser.getAuthCd()));
+		map.put("managerName", manager.getName());
 		return map;
+
 	}
 
 	/**
-     * 組織コードをもとに全所属ユーザを取得し、連想配列(Map)に変換する。
-     * @param orgCd 組織コード
-     * @return Map<String,Object> ユーザ情報リスト
-     */
-    public Map<String, Object> getUser(String orgCd) {
-    	List<MUser> mUsers = muserDao.getAllUserByOrgCd(orgCd);
-		Map<String, Object> map2 = new HashMap<String, Object>();
+	 * 組織コードをもとに全所属ユーザを取得し、連想配列(Map)に変換する。
+	 * @param orgCd 組織コード
+	 * @return Map<String,Object> ユーザ情報リスト
+	 */
+	public Map<String, Object> getUser(String orgCd) {
+		//    	List<MUser> mUsers = muserDao.getAllUserByOrgCd(orgCd);
+		//		Map<String, Object> map2 = new HashMap<String, Object>();
+		//		MOrg mOrg = morgDao.getByPk(orgCd);
+		//		int i = 0;
+		//
+		//		for(MUser mu : mUsers) {
+		//			Map<String, Object> map = new HashMap<String, Object>();
+		//			map.put("userId", mu.getUserId());
+		//			map.put("name", mu.getName());
+		//			map.put("mail", mu.getMail());
+		//			map.put("authName", muserDao.getAuthNameByAuthCd(mu.getAuthCd()));
+		//			map.put("orgName", mOrg.getOrgName());
+		//			map2.put(String.valueOf(i++), map);
+		//		}
+		//		return map2;
+
+		//    	List<MUser> mUsers = muserDao.getAllUserByOrgCd(orgCd);
+		//    	Map<String, Object> map = new HashMap<String, Object>();
+		//    	map.put("results", mUsers);
+		//    	return map;
+
+		Map<String, Object> map = new HashMap<String, Object>();
+		List<MUser> mUsers = muserDao.getAllUserByOrgCd(orgCd);
+		ArrayList<UserInfoDto> uids = new ArrayList<UserInfoDto>();
 		MOrg mOrg = morgDao.getByPk(orgCd);
-		int i = 0;
-
-		for(MUser mu : mUsers) {
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("userId", mu.getUserId());
-			map.put("name", mu.getName());
-			map.put("mail", mu.getMail());
-			map.put("authName", muserDao.getAuthNameByAuthCd(mu.getAuthCd()));
-			map.put("orgName", mOrg.getOrgName());
-			map2.put(String.valueOf(i++), map);
+		for (MUser mu : mUsers) {
+			UserInfoDto uid = new UserInfoDto();
+			uid.setUserId(mu.getUserId().toString());
+			uid.setName(mu.getName());
+			uid.setAuthName(muserDao.getAuthNameByAuthCd(mu.getAuthCd()));
+			uid.setOrgName(mOrg.getOrgName());
+			uid.setMail(mu.getMail());
+			uids.add(uid);
 		}
-		return map2;
+		map.put("results", uids);
+		return map;
 	}
-
 
 	/**
 	 * ユーザIDをもとにユーザを取得する。

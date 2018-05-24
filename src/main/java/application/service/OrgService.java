@@ -28,12 +28,16 @@ public class OrgService {
      * @return Map<String,Object> 組織情報リスト
      */
     public Map<String,Object> getOrgMapByOrgCd(String orgCd) {
+//    	MOrg mOrg = morgDao.getByPk(orgCd);
+//    	Map<String, Object> map = new HashMap<>();
+//    	map.put("orgCd", mOrg.getOrgCd());
+//    	map.put("orgName", mOrg.getOrgName());
+//    	map.put("dispSeq", mOrg.getDispSeq());
+//        return map;
     	MOrg mOrg = morgDao.getByPk(orgCd);
     	Map<String, Object> map = new HashMap<>();
-    	map.put("orgCd", mOrg.getOrgCd());
-    	map.put("orgName", mOrg.getOrgName());
-    	map.put("dispSeq", mOrg.getDispSeq());
-        return map;
+    	map.put("results", mOrg);
+    	return map;
     }
 
     /**
@@ -42,17 +46,21 @@ public class OrgService {
      * @return Map<String,Object> 組織情報リスト
      */
     public Map<String, Object> getOrg() {
+//    	List<MOrg> mOrgs = morgDao.getAll();
+//		Map<String, Object> map2 = new HashMap<String, Object>();
+//		int i = 0;
+//
+//		for(MOrg mo : mOrgs) {//mOrgsという連想配列にList<MOrg>の情報を格納
+//			Map<String, Object> map = new HashMap<String, Object>();
+//			map.put("OrgCd", mo.getOrgCd());
+//			map.put("OrgName", mo.getOrgName());
+//			map2.put(String.valueOf(i++), map);
+//		}
+//		return map2;
     	List<MOrg> mOrgs = morgDao.getAll();
-		Map<String, Object> map2 = new HashMap<String, Object>();
-		int i = 0;
-
-		for(MOrg mo : mOrgs) {//mOrgsという連想配列にList<MOrg>の情報を格納
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("OrgCd", mo.getOrgCd());
-			map.put("OrgName", mo.getOrgName());
-			map2.put(String.valueOf(i++), map);
-		}
-		return map2;
+    	Map<String, Object> map = new HashMap<String, Object>();
+    	map.put("results", mOrgs);
+    	return map;
 	}
 
     /**
