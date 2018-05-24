@@ -51,8 +51,7 @@ public class AttendanceListService extends AbstractAttendanceService {
 
 		//メッセージの送信
 		String msg = AppMesssageSource.getMessage("line.listYearMonth");
-		System.out.println(msg);
-		//LineAPIService.repryMessage(replyToken, msg);
+		LineAPIService.repryMessage(replyToken, msg);
 	}
 
 	/**
@@ -72,36 +71,30 @@ public class AttendanceListService extends AbstractAttendanceService {
 		if (Pattern.compile("^[0-9]{4}/[01]*[0-9]").matcher(text).find()) {
 			user = mUserDao.getByLineId(lineId);
 			ym = text;
-			System.out.println("年月入力");
 
 			//リスト選択？
 		} else if (lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION)) {
 			user = mUserDao.getByPk(Integer.parseInt(text.split(" ")[0]));
 			ym = lineStatus.getContents();
-			System.out.println("リスト選択");
-			System.out.println(ym);
-			System.out.println(text);
 		} else {
-			System.out.println("年月入力リスト選択以外");
-			//LineAPIService.repryMessage(replyToken, AppMesssageSource.getMessage("line.api.err.userNotExists"));
+			LineAPIService.repryMessage(replyToken, AppMesssageSource.getMessage("line.api.err.userNotExists"));
 			return;
 		}
 
 		if (user == null) {
-			System.out.println("ユーザー不在");
-			//LineAPIService.repryMessage(replyToken, AppMesssageSource.getMessage("line.api.err.userNotExists"));
+			LineAPIService.repryMessage(replyToken, AppMesssageSource.getMessage("line.api.err.userNotExists"));
 			return;
 		}
 
 		//修正フラグ
-		boolean editFlg = false;
-
-		//一般・上司・管理者チェック
-		StringBuilder msg = new StringBuilder();
+		boolean editFlg;
 
 		if (user.getAuthCd().equals("01") || (lineStatus.getActionName() != null
 				&& lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION))) {
 			//勤怠情報表示
+
+			//文字列型の勤怠情報
+			StringBuilder msg = new StringBuilder();
 
 			//カレンダー
 			Calendar cal = Calendar.getInstance();
@@ -162,9 +155,9 @@ public class AttendanceListService extends AbstractAttendanceService {
 			}
 
 			//単体テスト用
-			System.out.println("_____msgList_____");
-			System.out.println(msg.toString());
-			System.out.println("_____msgList_____");
+//			System.out.println("_____msgList_____");
+//			System.out.println(msg.toString());
+//			System.out.println("_____msgList_____");
 
 			//LINEステータス更新
 			lineStatus.setMenuCd("empty");
@@ -173,12 +166,12 @@ public class AttendanceListService extends AbstractAttendanceService {
 			tLineStatusDao.save(lineStatus);
 
 			//メッセージの送信
-			//LineAPIService.repryMessage(replyToken, msg.toString());
+			LineAPIService.repryMessage(replyToken, msg.toString());
 		} else {
 			//上司・管理者の場合
 			//部下情報検索
 			List<MUser> junior;
-			if (user.getAuthCd().equals("01")) {
+			if (user.getAuthCd().equals("02")) {
 				junior = mUserDao.getByManagerId(user.getUserId());
 			} else {
 				junior = mUserDao.getAll();
@@ -196,18 +189,17 @@ public class AttendanceListService extends AbstractAttendanceService {
 			}
 
 			//単体テスト用
-			System.out.println("_____msgList_____");
-			System.out.println(msgList.toString());
-			System.out.println("_____msgList_____");
+//			System.out.println("_____msgList_____");
+//			System.out.println(msgList.toString());
+//			System.out.println("_____msgList_____");
 
 			//LINEステータス更新
-			lineStatus.setMenuCd("03");
 			lineStatus.setActionName(ACTION_LIST_USER_SELECTION);
 			lineStatus.setContents(text);
 			tLineStatusDao.save(lineStatus);
 
 			//テンプレートメッセージ送信
-			//LineAPIService.pushButtons(lineId, AppMesssageSource.getMessage("line.selectMenu"), msgList);
+			LineAPIService.pushButtons(lineId, AppMesssageSource.getMessage("line.selectMenu"), msgList);
 
 		}
 	}
