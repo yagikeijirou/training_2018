@@ -13,9 +13,9 @@
 	href="../../static/lib/admin-lte/bower_components/select2/dist/css/bootstrap.min.css" />
 
 <!-- 組織表のテンプレ -->
-	<script id="org-record-tmpl" type="text/x-jsrender">
+<script id="org-record-tmpl" type="text/x-jsrender">
         <tr class="clickable" onclick="findUser('{{:orgCd}}')">
-            <td class="vert-align col-md-4">
+            <td class="vert-align col-md-5">
                 {{:orgCd}}
             </td>
             <td class="vert-align col-md-7">
@@ -32,8 +32,8 @@
         </tr>
     	</script>
 
-	<!-- ユーザ表のテンプレ -->
-	<script id="user-record-tmpl" type="text/x-jsrender">
+<!-- ユーザ表のテンプレ -->
+<script id="user-record-tmpl" type="text/x-jsrender">
         <tr>
             <td class="vert-align col-md-1">
                 <input type="checkbox" name="userIds" value="{{:userId}}" class="checkUser"/>
@@ -80,8 +80,6 @@
 						<a class="btn btn-s btn-info" href="#" onclick="openRegisterOrg()">
 							<i class="fa fa-plus"></i>
 						</a>
-					</div>
-					<div class="box-body">
 						<table class="table table-hover table-bordered">
 							<thead>
 								<tr>
@@ -106,17 +104,16 @@
 						<h3 class="box-title">ユーザ管理</h3>
 					</div>
 					<div class="box-body">
-						<a class="btn btn-s btn-danger" href="#" onclick="handleDeleteUsers()">
-							<i class="fa fa-trash"></i>
+						<a class="btn btn-s btn-danger" href="#"
+							onclick="handleDeleteUsers()"> <i class="fa fa-trash"></i>
 						</a> <a class="btn btn-s btn-info" href="#"
 							onclick="openRegisterUser()"> <i class="fa fa-plus"></i>
 						</a>
-					</div>
-					<div class="box-body">
 						<table class="table table-hover table-bordered">
 							<thead>
 								<tr>
-									<th><input type="checkbox" id="userAllCheck" /></th>
+									<th><input type="checkbox" id="userAllCheck"
+										onclick="onUserAllSelecting()" /></th>
 									<th>ユーザID</th>
 									<th>権限</th>
 									<th>組織</th>
@@ -133,87 +130,122 @@
 			</section>
 		</div>
 
-
-
-	</div>
-
-	<!-- 組織モーダル(登録・更新) -->
-	<div class="modal" id="modal-org-form" tabindex="-1" role="dialog">
-		<div class="modal-dialog" role="document">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal"
-						aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-					<h4 class="modal-title">組織登録</h4>
-				</div>
-				<div>
-					組織コード <input type="text" id="org-cd" />
-				</div>
-				<div>
-					組織名 <input type="text" id="org-name" />
-				</div>
-				<div>
-					表示順序 <input type="text" id="disp-seq" />
-				</div>
-				<div id="org-register-button">
-					<button type="button" onclick="handleRegisterOrg()">保存</button>
-				</div>
-				<div id="org-update-button">
-					<button type="button" onclick="handleUpdateOrg()">保存</button>
-				</div>
-				<div>
-					<button type="button">キャンセル</button>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<!-- ユーザモーダル(登録・更新) -->
-	<div class="modal" id="modal-user-form" tabindex="-1" role="dialog">
-		<div class="modal-dialog" role="document">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal"
-						aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-					<h4 class="modal-title">ユーザ登録</h4>
-				</div>
-				<div>
-					ユーザID <input type="text" id="user-id" />
-				</div>
-				<div>
-					パスワード <input type="password" id="password" />
-				</div>
-				<div>
-					名前 <input type="text" id="name" />
-				</div>
-				<div>
-					メールアドレス <input type="text" id="mail" />
-				</div>
-				<div id="user-org-cd">組織</div>
-				<div id="manager-id">上司</div>
-				<div id="auth-cd">権限</div>
-				<div id="org-register-button">
-					<button type="button" onclick="handleRegisterUser()">保存</button>
-				</div>
-				<div id="org-update-button">
-					<button type="button" onclick="handleUpdateUser()">保存</button>
-				</div>
-				<div>
-					<button type="button">キャンセル</button>
+		<!-- 組織モーダル(登録・更新) -->
+		<div class="modal" id="modal-org-form" tabindex="-1" role="dialog">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 class="modal-title">組織登録</h4>
+					</div>
+					<div class="modal-body">
+						<form id="org-register-form" class="form-horizontal">
+							<div class="form-group">
+								<label class="col-md-3 control-label" for="user-id">組織コード</label>
+								<div class="col-md-9">
+									<input type="text" name="orgCd" id="org-cd" />
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-md-3 control-label" for="user-id">組織名</label>
+								<div class="col-md-9">
+									<input type="text" name="orgName" id="org-name" />
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-md-3 control-label" for="user-id">表示順序</label>
+								<div class="col-md-9">
+									<input type="text" name="dispSeq" id="disp-seq" />
+								</div>
+							</div>
+						</form>
+						<div class="modal-footer">
+							<button type="button" id="org-register-button"
+								class="btn btn-primary" onclick="handleRegisterOrg()">保存</button>
+							<button type="button" id="org-update-button"
+								class="btn btn-primary" onclick="handleUpdateOrg()">保存</button>
+							<button type="button" class="btn btn-default"
+								data-dismiss="modal">キャンセル</button>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
 
+		<!-- ユーザモーダル(登録・更新) -->
+		<div class="modal" id="modal-user-form" tabindex="-1" role="dialog">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 class="modal-title">ユーザ登録</h4>
+					</div>
+					<div class="modal-body">
+						<form id="user-register-form" class="form-horizontal">
+							<div class="form-group">
+								<label class="col-md-3 control-label" for="user-id">ユーザID</label>
+								<div class="col-md-9">
+									<input type="text" name="userId" id="user-id" />
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-md-3 control-label" for="password">パスワード</label>
+								<div class="col-md-9">
+									<input type="password" name="pssword" id="password" />
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-md-3 control-label" for="name">名前</label>
+								<div class="col-md-9">
+									<input type="text" name="name" id="name" />
+								</div>
+							</div>
 
+							<div class="form-group">
+								<label class="col-md-3 control-label" for="mail">メールアドレス</label>
+								<div class="col-md-9">
+									<input type="text" name="mail" id="mail" />
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-md-3 control-label" for="user-org-cd">組織</label>
+								<div class="col-md-9">
+									<select name="orgCd" id="user-org-cd"></select>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-md-3 control-label" for="manager-id">上司</label>
+								<div class="col-md-9">
+									<select name="managerId" id="manager-id"></select>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-md-3 control-label" for="auth-cd"> 権限</label>
+								<div class="col-md-9">
+									<select name="authCd" id="auth-cd"></select>
+								</div>
+							</div>
+
+						</form>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-primary"
+								id="user-register-button" onclick="handleRegisterUser()">保存</button>
+							<button type="button" class="btn btn-primary"
+								id="user-update-button" onclick="handleUpdateUser()">保存</button>
+							<button type="button" class="btn btn-default"
+								data-dismiss="modal">キャンセル</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
-
-
-
-
 
 
 	<div layout:fragment="script" th:remove="tag">

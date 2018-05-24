@@ -386,7 +386,9 @@ $(function() {
             url: '/admin/orgs/select2',
             dataType: "json",
             delay: 250
-        }});
+        },
+        minimumResultsForSearch: Infinity // 検索枠を表示させないようにするために設定
+    });
 
     $('#manager-id').select2({
         ajax: {
@@ -396,13 +398,14 @@ $(function() {
             data: function (params) {
               var query = {
                 orgCd: $('#user-org-cd').val(),
-                name: params.term
+                //name: params.term　今回は検索機能は使用しない
               }
               return query;
         }
         },
         allowClear: true, // 未選択可能
-        placeholder: ""   // allowClearによる未選択動作時に必要
+        placeholder: "",   // allowClearによる未選択動作時に必要
+        minimumResultsForSearch: Infinity // 検索枠を表示させないようにするために設定
     });
 
     $('#auth-cd').select2({
@@ -410,7 +413,7 @@ $(function() {
             url: '/admin/auths/select2',
             dataType: "json"
         },
-        minimumResultsForSearch: 100 // 検索枠を表示させないようにするために設定
+        minimumResultsForSearch: Infinity // 検索枠を表示させないようにするために設定
     });
 
 });
