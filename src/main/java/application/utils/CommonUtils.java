@@ -163,7 +163,7 @@ public final class CommonUtils {
             return res;
         }
 
-        if (hourMinute.contains("/")) {
+        if (hourMinute.contains(":")) {
             res = parseDateText(hourMinute, "H:m", "HHmm");
         } else if (hourMinute.length() == 4) {
             res = parseDateText(hourMinute, "HHmm", "HHmm");

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,18 +73,22 @@ public class AttendanceListService extends AbstractAttendanceService {
 		boolean editFlg;
 
 		//年月入力？
-		if (Pattern.compile("^[0-9]{4}/[01]*[0-9]").matcher(text).find()) {
+		if (CommonUtils.toYearMonth(text) != null) {
 			user = mUserDao.getByLineId(lineId);
-			ym = text;
-
-		//リスト選択？
-		} else if (lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION)) {
-			user = mUserDao.getByPk(Integer.parseInt(text.split(" ")[0]));
-			if(user==null) {
+			ym = CommonUtils.toYearMonth(text);
+			//リスト選択？
+		} else if (lineStatus.getActionName() != null) {
+			if (lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION)) {
+				user = mUserDao.getByPk(Integer.parseInt(text.split(" ")[0]));
+				if (user == null) {
+					LineAPIService.repryMessage(replyToken, AppMesssageSource.getMessage("入力に誤りがある可能性があります。"));
+					return;
+				}
+				ym = CommonUtils.toYearMonth(lineStatus.getContents());
+			} else {
 				LineAPIService.repryMessage(replyToken, AppMesssageSource.getMessage("入力に誤りがある可能性があります。"));
 				return;
 			}
-			ym = lineStatus.getContents();
 
 		} else {
 			LineAPIService.repryMessage(replyToken, AppMesssageSource.getMessage("入力に誤りがある可能性があります。"));
@@ -100,7 +103,7 @@ public class AttendanceListService extends AbstractAttendanceService {
 		if (user.getAuthCd().equals("01") || (lineStatus.getActionName() != null
 				&& lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION))) {
 
-			//勤怠情報
+			//月単位の勤怠情報
 			StringBuilder msg = new StringBuilder();
 
 			//出勤、退勤情報
@@ -108,23 +111,20 @@ public class AttendanceListService extends AbstractAttendanceService {
 
 			//カレンダー
 			Calendar cal = Calendar.getInstance();
-			cal.set(Calendar.YEAR, Integer.parseInt(ym.split("/")[0]));
-			cal.set(Calendar.MONTH, Integer.parseInt(ym.split("/")[1]));
+			cal.set(Calendar.YEAR, Integer.parseInt(ym.substring(0, 4)));
+			cal.set(Calendar.MONTH, Integer.parseInt(ym.substring(4, 6)));
 			int lastDayOfMonth = cal.getActualMaximum(Calendar.DATE);
 
 			//フォーマット
-			SimpleDateFormat sdf = new SimpleDateFormat("hh:mm");
 			SimpleDateFormat sdf2 = new SimpleDateFormat("E");
 
 			//メッセージ作成(mm/dd(D) hh:mm ~ hh:mm #{"修正"}||#{""})
 			for (int i = 1; i <= lastDayOfMonth; i++) {
 				editFlg = false;
 
-				arrival_t = tAttendanceDao.getByPk(user.getUserId(), "01",
-						CommonUtils.toYearMonth(ym) + String.format("%02d", i));
-				clock_out_t = tAttendanceDao.getByPk(user.getUserId(), "02",
-						CommonUtils.toYearMonth(ym) + String.format("%02d", i));
-				msg.append(String.format("%02d", Integer.parseInt(ym.split("/")[1])));
+				arrival_t = tAttendanceDao.getByPk(user.getUserId(), "01", ym + String.format("%02d", i));
+				clock_out_t = tAttendanceDao.getByPk(user.getUserId(), "02", ym + String.format("%02d", i));
+				msg.append(String.format("%02d", Integer.parseInt(ym.substring(4, 6))));
 				msg.append("/");
 				msg.append(String.format("%02d", i));
 				msg.append("(");
@@ -134,22 +134,22 @@ public class AttendanceListService extends AbstractAttendanceService {
 
 				if (arrival_t != null && clock_out_t != null) {
 					//出勤レコード
-					msg.append(sdf.format(arrival_t.getAttendanceTime()));
+					msg.append(CommonUtils.toHMm(arrival_t.getAttendanceTime()));
 					msg.append("～");
 					//退勤レコード
-					msg.append(sdf.format(clock_out_t.getAttendanceTime()));
+					msg.append(CommonUtils.toHMm(clock_out_t.getAttendanceTime()));
 					if ((arrival_t.getEditFlg().equals("1")) || (clock_out_t.getEditFlg().equals("1"))) {
 						editFlg = true;
 					}
 				} else if (arrival_t != null) {//出勤レコードのみ
-					msg.append(sdf.format(arrival_t.getAttendanceTime()));
+					msg.append(CommonUtils.toHMm(arrival_t.getAttendanceTime()));
 					msg.append("～");
 					if (arrival_t.getEditFlg().equals("1")) {
 						editFlg = true;
 					}
 				} else if (clock_out_t != null) {//退勤レコードのみ
 					msg.append("～");
-					msg.append(sdf.format(clock_out_t.getAttendanceTime()));
+					msg.append(CommonUtils.toHMm(clock_out_t.getAttendanceTime()));
 					if (clock_out_t.getEditFlg().equals("1")) {
 						editFlg = true;
 					}
@@ -161,6 +161,8 @@ public class AttendanceListService extends AbstractAttendanceService {
 				}
 				msg.append(System.getProperty("line.separator"));
 			}
+
+			//logger.debug("msg {}", msg);
 
 			//LINEステータス更新
 			lineStatus.setMenuCd("empty");
@@ -192,6 +194,8 @@ public class AttendanceListService extends AbstractAttendanceService {
 					}
 				}
 			}
+
+			//logger.debug("msgList {}", msgList);
 
 			//LINEステータス更新
 			lineStatus.setActionName(ACTION_LIST_USER_SELECTION);

@@ -136,6 +136,16 @@ public class MUserDao extends AbstractDao<MUser> {
 	}
 
 	/**
+	 * 組織コードから全ての上司ユーザを取り出す。
+	 * @param orgCd 組織コード
+	 * @return ユーザエンティティリスト
+	 * @author 黄倉大輔
+	 */
+	public List<MUser> getAllManagerByOrgCd(String orgCd) {
+		return sqlTemplate.forList("sql/MUserDao/selectAllManagerByOrgCd.sql", MUser.class, orgCd);
+	}
+
+	/**
 	 * 権限コードから権限名を取得する。
 	 * @param authCd 権限コード
 	 * @return authName 権限名

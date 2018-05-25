@@ -29,11 +29,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import application.entity.MOrg;
 import application.entity.MSetting;
+import application.entity.MUser;
 import application.form.OrgForm;
 import application.form.SettingForm;
 import application.form.UserForm;
-import application.service.DivisionService;
 import application.service.ListOutputService;
 import application.service.OrgService;
 import application.service.SettingService;
@@ -71,9 +72,9 @@ public class AdminController {
 	@Autowired
 	private OrgService orgService;
 
-	/** 区分サービス。*/
-	@Autowired
-	private DivisionService divisionService;
+//	/** 区分サービス。*/
+//	@Autowired
+//	private DivisionService divisionService;
 
 	/** 設定サービス。*/
 	@Autowired
@@ -89,7 +90,7 @@ public class AdminController {
 	 */
 	@RequestMapping(value = "/login", method = RequestMethod.GET)
 	public String login() {
-		return "admin/login";//@Controllerのついたクラスでは、""内はURLとみなされる
+		return "admin/login";
 	}
 
 	/**
@@ -128,45 +129,49 @@ public class AdminController {
 	 * 組織検索を実行する。
 	 *
 	 * @return 組織検索結果
+	 * @author 黄倉大輔
 	 */
-	//組織の検索結果の文字列を返す？
 	@RequestMapping(value = "/find-orgs", method = RequestMethod.GET)
 	public @ResponseBody Map<String, Object> findOrgs() {
 
-		return null;
+		return orgService.getOrg();
+
 	}
 
 	/**
 	 * 組織を取得する。
 	 * @param orgCd 組織コード
 	 * @return 組織情報
+	 * @author 黄倉大輔
 	 */
 	@RequestMapping(value = "/find-org", method = RequestMethod.GET)
 	public @ResponseBody Map<String, Object> findOrg(@RequestParam(required = true) String orgCd) {
 
-		return null;
+		return orgService.getOrgMapByOrgCd(orgCd);
 	}
 
 	/**
 	 * ユーザ検索を実行する。
 	 *
 	 * @return ユーザ検索結果
+	 * @author 黄倉大輔
 	 */
 	@RequestMapping(value = "/find-users", method = RequestMethod.GET)
 	public @ResponseBody Map<String, Object> findUsers(@RequestParam(required = false) String orgCd) {
 
-		return null;
+		return userService.getUser(orgCd);
 	}
 
 	/**
 	 * ユーザを取得する。
 	 * @param userId ユーザID
 	 * @return 組織情報
+	 * @author 黄倉大輔
 	 */
 	@RequestMapping(value = "/find-user", method = RequestMethod.GET)
 	public @ResponseBody Map<String, Object> findUser(@RequestParam(required = true) Integer userId) {
 
-		return null;
+		return userService.getUserMapByUserId(userId);
 	}
 
 	/**
@@ -218,11 +223,21 @@ public class AdminController {
 	 * @param orgForm 組織フォーム
 	 * @param bindingResult バインド結果
 	 * @return 登録結果
+	 * @author 黄倉大輔
 	 */
 	@RequestMapping(value = "/orgs", method = RequestMethod.POST)
 	@ResponseBody
-	public ResponseEntity<Map<String, Object>> registerOrg(OrgForm orgForm) {
+	public ResponseEntity<Map<String, Object>> registerOrg(@Valid @ModelAttribute OrgForm orgForm,
+			BindingResult bindingResult) {
 
+		//エラー発生時、ログを書いてエラーを送出する
+		if (bindingResult.hasErrors()) {
+			log.debug("validate error: {}", bindingResult.toString());
+			return genValidationErrorResponse(bindingResult);
+		}
+
+		MOrg mOrg = modelMapper.map(orgForm, MOrg.class); // フォームクラスからエンティティクラスにマッピングする
+		orgService.registerOrg(mOrg); // 登録処理を実行
 		return null;
 	}
 
@@ -231,12 +246,21 @@ public class AdminController {
 	 * @param orgForm 組織フォーム
 	 * @param bindingResult バインド結果
 	 * @return 更新結果
+	 * @author 黄倉大輔
 	 */
 	@RequestMapping(value = "/org-update", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> updateOrgs(@Valid @ModelAttribute OrgForm orgForm,
 			BindingResult bindingResult) {
 
+		//エラー発生時、ログを書いてエラーを送出する
+		if (bindingResult.hasErrors()) {
+			log.debug("validate error: {}", bindingResult.toString());
+			return genValidationErrorResponse(bindingResult);
+		}
+
+		MOrg mOrg = modelMapper.map(orgForm, MOrg.class); // フォームクラスからエンティティクラスにマッピングする
+		orgService.updateOrg(mOrg); // 更新処理を実行
 		return null;
 	}
 
@@ -244,12 +268,15 @@ public class AdminController {
 	 * 組織を削除する。
 	 * @param orgCd 組織コード
 	 * @return 削除結果
+	 * @author 黄倉大輔
 	 */
 	@RequestMapping(value = "/org-delete", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> deleteOrg(@RequestParam(value = "orgCd") String orgCd) {
 
-		return null;
+		MOrg mOrg = orgService.getOrgByOrgCd(orgCd);//組織コードからエンティティを取得
+		orgService.deleteOrg(mOrg); // 削除処理を実行
+		return null;//javascript側で引数resが使用されていないため、nullでよい？
 	}
 
 	/**
@@ -257,12 +284,21 @@ public class AdminController {
 	 * @param userForm ユーザフォーム
 	 * @param bindingResult バインド結果
 	 * @return ユーザ登録結果
+	 * @author 黄倉大輔
 	 */
 	@RequestMapping(value = "/users", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> registerUser(@Valid @ModelAttribute UserForm userForm,
 			BindingResult bindingResult) {
 
+		//エラー発生時、ログを書いてエラーを送出する
+		if (bindingResult.hasErrors()) {
+			log.debug("validate error: {}", bindingResult.toString());
+			return genValidationErrorResponse(bindingResult);
+		}
+
+		MUser mUser = modelMapper.map(userForm, MUser.class); // フォームクラスからエンティティクラスにマッピングする
+		userService.registerUser(mUser); // 登録処理を実行
 		return null;
 	}
 
@@ -271,14 +307,21 @@ public class AdminController {
 	 * @param userForm ユーザフォーム
 	 * @param bindingResult バインド結果
 	 * @return 更新結果
+	 * @author 黄倉大輔
 	 */
 	@RequestMapping(value = "/user-update", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> updateUser(@Valid @ModelAttribute UserForm userForm,
 			BindingResult bindingResult) {
 
-		log.debug("requested user form: {}", userForm);
+		//log.debug("requested user form: {}", userForm);
+		if (bindingResult.hasErrors()) {
+			log.debug("validate error: {}", bindingResult.toString());
+			return genValidationErrorResponse(bindingResult);
+		}
 
+		MUser mUser = modelMapper.map(userForm, MUser.class); // フォームクラスからエンティティクラスにマッピングする
+		userService.updateUser(mUser); // 更新処理を実行
 		return null;
 	}
 
@@ -286,12 +329,14 @@ public class AdminController {
 	 * ユーザを削除する。
 	 * @param userIds ユーザID
 	 * @return 削除結果
+	 * @author 黄倉大輔
 	 */
 	@RequestMapping(value = "/user-delete", method = RequestMethod.POST)
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> deleteUser(
 			@RequestParam(value = "userIds") List<Integer> userIds) {
 
+		userService.deleteSomeUsers(userIds);
 		return null;
 	}
 
@@ -299,11 +344,12 @@ public class AdminController {
 	 * 組織選択Select2データソースを取得する。
 	 * @param q 組織名検索ワード
 	 * @return 組織選択Select2データソース
+	 * @author 黄倉大輔
 	 */
 	@RequestMapping(value = "/orgs/select2", method = RequestMethod.GET)
 	public @ResponseBody Map<String, Object> getOrgSelect2Data(@RequestParam(required = false) String q) {
 
-		return null;
+		return orgService.select2OrgList();
 	}
 
 	/**
@@ -311,22 +357,24 @@ public class AdminController {
 	 * @param orgCd 組織コード
 	 * @param name ユーザ名検索ワード
 	 * @return ユーザ選択Select2データソース
+	 * @author 黄倉大輔
 	 */
 	@RequestMapping(value = "/users/select2", method = RequestMethod.GET)
 	public @ResponseBody Map<String, Object> getUserSelect2Data(@RequestParam(required = false) String orgCd,
 			@RequestParam(required = false) String name) {
 
-		return null;
+		return userService.select2ManagerList(orgCd);
 	}
 
 	/**
 	 * 権限選択Select2データソースを取得する。
 	 * @return 権限選択Select2データソース
+	 * @author 黄倉大輔
 	 */
 	@RequestMapping(value = "/auths/select2", method = RequestMethod.GET)
 	public @ResponseBody Map<String, Object> getAuthSelect2Data() {
 
-		return null;
+		return userService.select2AuthList();
 	}
 
 	/**
@@ -350,11 +398,9 @@ public class AdminController {
 	 * @throws JsonProcessingException CSV変換時の例外
 	 * @author 荒木麻里
 	 */
-
 	@RequestMapping(value = "/attendance.csv", method = RequestMethod.GET, produces = "text/csv; charset=SHIFT-JIS; Content-Disposition: attachment")
-	@GetMapping(value = "*.csv",
-    produces = MediaType.APPLICATION_OCTET_STREAM_VALUE + "; charset=Shift_JIS; Content-Disposition: attachment")
-
+	@GetMapping(value = "*.csv", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE
+			+ "; charset=Shift_JIS; Content-Disposition: attachment")
 
 	@ResponseBody
 	public Object attendanceCsv(String outputYearMonth) throws JsonProcessingException {
