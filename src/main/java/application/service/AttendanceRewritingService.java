@@ -31,6 +31,7 @@ import application.utils.CommonUtils;
  * 2018/05/23-須永寛紀-POSTされた情報をlineステータス情報に保存するコードに修正
  * 2018/05/24-須永寛紀-Date型にyyyyMMddkkmmを格納するコードを追記
  * 2018/05/25-須永寛紀-CommonUtilを使ったコードに変更
+ * 2018/05/25-須永寛紀-lineStatus.getActionName()がnullたっだ場合に対応
  *
  *         </pre>
  */
@@ -79,12 +80,12 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 	public void editAction(String lineId, String replyToken, TLineStatus lineStatus, String text) {
 		logger.debug("editAction()");
 
-		if (text == null) {
+		if (text.equals(null)) {
 			logger.debug("editAction()textIsNull");
 			return;
 		}
 
-		if(lineStatus.getActionName() == null) {
+		if(lineStatus.getActionName().equals(null)) {
 			lineStatus.setActionName(ACTION_EDIT_DATE);
 			logger.debug("editAction()ChangeActionName");
 		}
@@ -94,7 +95,7 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 		if (lineStatus.getActionName().equals(ACTION_EDIT_DATE)) {
 			logger.debug("editAction()editDate");
 			String MMdd = CommonUtils.toMonthDate(text);
-			if (MMdd == null) {
+			if (MMdd.equals(null)) {
 				String msg = AppMesssageSource.getMessage("line.editMonthDate");
 				LineAPIService.repryMessage(replyToken, msg);
 				logger.debug("editAction()editDateFormatErr");
@@ -151,7 +152,7 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 						|| lineStatus.getActionName().equals(ACTION_EDIT_INPUT_TIME_CLOCKOUT)) {
 			logger.debug("editAction()editTime");
 			String HourMinute = CommonUtils.toHourMinute(text);
-			if (HourMinute == null) {
+			if (HourMinute.equals(null)) {
 				String msg = AppMesssageSource.getMessage("line.newAttendanceInput");
 				LineAPIService.repryMessage(replyToken, msg);
 				logger.debug(msg);
@@ -182,10 +183,12 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 			tAttendance.setAttendanceTime(yyyyMMddHHmm);
 			tAttendance.setEditFlg("1");
 			tAttendanceDao.update(tAttendance);
+			lineStatus.setActionName(null);
+			lineStatus.setContents(null);
+			tLineStatusDao.update(lineStatus);
 			//修正済みメッセージを送信
 			String msg = AppMesssageSource.getMessage("line.saveAttendance");
 			LineAPIService.repryMessage(replyToken, msg);
-			lineStatus.setActionName(null);
 			logger.debug("editAction()editTimeEnd");
 
 		}
