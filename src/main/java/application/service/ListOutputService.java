@@ -70,7 +70,7 @@ public class ListOutputService {
 		sb.append("arrival");
 		sb.append(",");
 		sb.append("clock-out");
-		sb.append("\r\n");
+		sb.append(System.getProperty("line.separator"));
 
 		//勤怠情報を取得する
 		for (TAttendance ta : tattendances) {
@@ -117,7 +117,7 @@ public class ListOutputService {
 			sb.append(arrival);
 			sb.append(",");
 			sb.append(clockout);
-			sb.append("\r\n");
+			sb.append(System.getProperty("line.separator"));
 		}
 		//文字列を返す
 		return new String(sb);
