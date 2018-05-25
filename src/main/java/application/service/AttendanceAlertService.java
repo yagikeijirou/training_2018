@@ -73,25 +73,19 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 
 		// アラートフラグがアラートなしならここで終了、アラートありなら続行
 		if (ms.getAlertFlag().equals("0")) {
-			System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
-			System.out.println("打刻漏れ防止アラートが設定されていません。");
-			System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
+			logger.debug("打刻漏れ防止アラートが設定されていません。");
 			return -1;
 		}
 
 		// 本日が営業日じゃないならここで終了、営業日なら続行
 		if (!getBusinessDay(ms).contains(beginCl.get(Calendar.DAY_OF_WEEK))) {
-			System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
-			System.out.println("本日は営業日ではありません。");
-			System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
+			logger.debug("本日は営業日ではありません。");
 			return -2;
 		}
 
 		// 今がアラートを出す時間ではないならここで終了、出す時間なら、出退どちらのアラートかを保持し続行
 		if ((alertMode = alertModeChecker(beginTime, endTime)) == 0) {
-			System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
-			System.out.println("打刻漏れ防止アラートを出す時刻ではありません。");
-			System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
+			logger.debug("打刻漏れ防止アラートを出す時刻ではありません。");
 			return -3;
 		}
 
@@ -103,11 +97,11 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 				tmpTa = tAttendanceDao.getByPk(eachUser.getUserId(), AttenanceCd.getByName("出勤").getCode(),
 						CommonUtils.toYyyyMmDd(beginTime));
 				if (tmpTa == null) {
-					LineAPIService.pushMessage(eachUser.getLineId(), AppMesssageSource.getMessage("line.alertNotFoundAttendance", "出勤"));
-					System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
-					System.out.println(AppMesssageSource.getMessage("line.alertNotFoundAttendance", "出勤"));
-					System.out.println("lineId: " + eachUser.getLineId());
-					System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
+					LineAPIService.pushMessage(eachUser.getLineId(),
+							AppMesssageSource.getMessage("line.alertNotFoundAttendance", "出勤"));
+					logger.debug(AppMesssageSource.getMessage("line.alertNotFoundAttendance", "出勤"));
+					logger.debug("push to lineId: " + eachUser.getLineId());
+
 					// 送信カウンタを1増やす
 					alertCounter++;
 				}
@@ -119,11 +113,10 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 						CommonUtils.toYyyyMmDd(beginTime));
 				if (tmpTa == null) {
 					// 最新勤怠情報が出勤 -> 退勤漏れ -> 退勤打刻漏れ防止アラート
-					LineAPIService.pushMessage(eachUser.getLineId(), AppMesssageSource.getMessage("line.alertNotFoundAttendance", "退勤"));
-					System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
-					System.out.println(AppMesssageSource.getMessage("line.alertNotFoundAttendance", "退勤"));
-					System.out.println("lineId: " + eachUser.getLineId());
-					System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
+					LineAPIService.pushMessage(eachUser.getLineId(),
+							AppMesssageSource.getMessage("line.alertNotFoundAttendance", "退勤"));
+					logger.debug(AppMesssageSource.getMessage("line.alertNotFoundAttendance", "退勤"));
+					logger.debug("push to lineId: " + eachUser.getLineId());
 					// 送信カウンタを1増やす
 					alertCounter++;
 				}
@@ -131,9 +124,7 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 
 		}
 
-		System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
-		System.out.println("打刻漏れ防止アラートを " + alertCounter + "人 に送信しました。");
-		System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
+		logger.debug("打刻漏れ防止アラートを " + alertCounter + "人 に送信しました。");
 
 		return alertCounter;
 	}
