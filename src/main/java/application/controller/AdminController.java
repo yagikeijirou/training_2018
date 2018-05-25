@@ -321,7 +321,7 @@ public class AdminController {
 		}
 
 		MUser mUser = modelMapper.map(userForm, MUser.class); // フォームクラスからエンティティクラスにマッピングする
-		userService.registerUser(mUser); // 更新処理を実行
+		userService.updateUser(mUser); // 更新処理を実行
 		return null;
 	}
 

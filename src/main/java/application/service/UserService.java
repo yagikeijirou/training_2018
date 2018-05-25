@@ -25,8 +25,8 @@ import application.entity.MUser;
 @Transactional
 public class UserService {
 
-//	@Autowired
-//	private PasswordEncoder passwordEncoder;
+	//	@Autowired
+	//	private PasswordEncoder passwordEncoder;
 
 	@Autowired
 	MUserDao muserDao;
@@ -58,13 +58,14 @@ public class UserService {
 
 		MUser mUser = muserDao.getByPk(userId);
 		MOrg mOrg = morgDao.getByPk(mUser.getOrgCd());
-		MUser manager = muserDao.getByPk(mUser.getManagerId());
 		Map<String, Object> map = new HashMap<>();
 
 		map.put("results", mUser);
 		map.put("orgName", mOrg.getOrgName());
 		map.put("authName", muserDao.getAuthNameByAuthCd(mUser.getAuthCd()));
-		map.put("managerName", manager.getName());
+		if (mUser.getManagerId() != null) {
+			map.put("managerName", muserDao.getByPk(mUser.getManagerId()).getName());
+		}
 		return map;
 
 	}
