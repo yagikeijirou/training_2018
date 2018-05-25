@@ -60,8 +60,8 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 		logger.debug("startRewriting()");
 		//3,LINE APIを用いて「修正する月日(yyyy/mm/dd)を入力してください」というテキストを送信する。
 		String msg = AppMesssageSource.getMessage("line.editMonthDate");
-		System.out.println(msg);
-		//LineAPIService.repryMessage(replyToken, msg);
+		LineAPIService.repryMessage(replyToken, msg);
+		logger.debug(msg);
 		logger.debug("startRewriting()end");
 
 	}
@@ -81,6 +81,7 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 			//3,LINE APIを用いて「修正する月日(yyyy/mm/dd)を入力してください」というテキストを送信する。
 			String msg = AppMesssageSource.getMessage("line.editMonthDate");
 			LineAPIService.repryMessage(replyToken, msg);
+			logger.debug(msg);
 			return;
 
 		}
@@ -100,16 +101,19 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 					//選択肢は「出勤」か「退勤」とする。
 					String msg = AppMesssageSource.getMessage("line.selectAttendanceCd");
 					LineAPIService.repryMessage(replyToken, msg);
+					logger.debug(msg);
 
 				} else {
 					String msg = AppMesssageSource.getMessage("line.editMonthDate");
 					LineAPIService.repryMessage(replyToken, msg);
+					logger.debug(msg);
 
 				}
 
 			} catch (ParseException e) {
 				String msg = AppMesssageSource.getMessage("line.editMonthDate");
 				LineAPIService.repryMessage(replyToken, msg);
+				logger.debug(msg);
 			}
 		}
 
@@ -125,6 +129,7 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 				//13,LINE APIを用いて「新しい{0}時刻(hhmm)を入力してください	」というテキストを送信する。
 				String msg = AppMesssageSource.getMessage("line.newAttendanceInput");
 				LineAPIService.repryMessage(replyToken, msg);
+				logger.debug(msg);
 			} else if (text.equals("退勤")) {
 				//12,POSTされた勤怠区分コードの情報を勤怠情報エンティティ「attendanceCd」として格納する。
 				lineStatus.setActionName(ACTION_EDIT_INPUT_TIME_CLOCKOUT);
@@ -132,9 +137,11 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 				//13,LINE APIを用いて「新しい{1}時刻(hhmm)を入力してください	」というテキストを送信する。
 				String msg = AppMesssageSource.getMessage("line.newAttendanceInput");
 				LineAPIService.repryMessage(replyToken, msg);
+				logger.debug(msg);
 			} else {
 				String msg = AppMesssageSource.getMessage("line.selectAttendanceCd");
 				LineAPIService.repryMessage(replyToken, msg);
+				logger.debug(msg);
 			}
 
 		}
@@ -164,8 +171,8 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 
 					if (tAttendance == null) {
 						String msg = "勤怠情報がありません";
-						System.out.println(msg);
 						LineAPIService.repryMessage(replyToken, msg);
+						logger.debug(msg);
 						return;
 					}
 					tAttendance.setEditFlg("1");
@@ -186,22 +193,25 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 						//19,更新が完了したらLINE APIを用いて「{0} {1}を保存しました」というテキストを送信する。
 						String msg = AppMesssageSource.getMessage("line.saveAttendance");
 						LineAPIService.repryMessage(replyToken, msg);
+						logger.debug(msg);
 					} else {
 						String msg = AppMesssageSource.getMessage("line.newAttendanceInput");
 						LineAPIService.repryMessage(replyToken, msg);
+						logger.debug(msg);
 					}
 
 				} else {
 					//13,LINE APIを用いて「新しい{1}時刻(hhmm)を入力してください	」というテキストを送信する。
 					String msg = AppMesssageSource.getMessage("line.newAttendanceInput");
-					System.out.println(msg);
 					LineAPIService.repryMessage(replyToken, msg);
+					logger.debug(msg);
 				}
 			} catch (ParseException e) {
 
 				//13,LINE APIを用いて「新しい{1}時刻(hhmm)を入力してください	」というテキストを送信する。
 				String msg = AppMesssageSource.getMessage("line.newAttendanceInput");
 				LineAPIService.repryMessage(replyToken, msg);
+				logger.debug(msg);
 			}
 
 		}
