@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 編集者　黄倉大輔 -->
+<!-- @auhtor　黄倉大輔 -->
 <html lang="jp" xmlns:th="http://www.thymeleaf.org"
 	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorator="adminLayout">
@@ -12,7 +12,7 @@
 	th:href="@{/lib/admin-lte/bower_components/select2/dist/css/select2.min.css}"
 	href="../../static/lib/admin-lte/bower_components/select2/dist/css/bootstrap.min.css" />
 
-<!-- 組織表のテンプレ -->
+<!-- 組織表テンプレート -->
 <script id="org-record-tmpl" type="text/x-jsrender">
         <tr class="clickable" onclick="findUser('{{:orgCd}}')">
             <td class="vert-align col-md-5">
@@ -32,7 +32,7 @@
         </tr>
     	</script>
 
-<!-- ユーザ表のテンプレ -->
+<!-- ユーザ表テンプレート -->
 <script id="user-record-tmpl" type="text/x-jsrender">
         <tr>
             <td class="vert-align col-md-1">
@@ -69,7 +69,7 @@
 
 		<!-- 本文 -->
 		<div class="col-md-4">
-			<!-- 組織表見出し -->
+			<!-- 組織表-->
 			<section class="content">
 				<div class="box box-default">
 					<div class="box-header with-border">
@@ -97,7 +97,7 @@
 		</div>
 
 		<div class="col-md-8">
-			<!-- ユーザ表見出し -->
+			<!-- ユーザ表 -->
 			<section class="content">
 				<div class="box box-default">
 					<div class="box-header with-border">

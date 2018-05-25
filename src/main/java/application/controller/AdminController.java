@@ -297,6 +297,7 @@ public class AdminController {
 			return genValidationErrorResponse(bindingResult);
 		}
 
+		userForm.setPassword(passwordEncoder.encode(userForm.getPassword()));//パスワードをハッシュ化する
 		MUser mUser = modelMapper.map(userForm, MUser.class); // フォームクラスからエンティティクラスにマッピングする
 		userService.registerUser(mUser); // 登録処理を実行
 		return null;
@@ -320,6 +321,7 @@ public class AdminController {
 			return genValidationErrorResponse(bindingResult);
 		}
 
+		userForm.setPassword(passwordEncoder.encode(userForm.getPassword()));//パスワードをハッシュ化する
 		MUser mUser = modelMapper.map(userForm, MUser.class); // フォームクラスからエンティティクラスにマッピングする
 		userService.updateUser(mUser); // 更新処理を実行
 		return null;
