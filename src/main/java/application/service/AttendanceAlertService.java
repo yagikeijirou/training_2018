@@ -54,6 +54,7 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 	 * @return 0以上の場合、アラートを出した人数。0未満の場合、終了コード。
 	 */
 	public int pushAlerts(Date beginTime, Date endTime) {
+
 		logger.debug("pushAlerts()");
 
 		/** beginTimeをCalendar型で持つための変数 **/
@@ -71,22 +72,29 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		/** アラート出力用一時勤怠情報 **/
 		TAttendance tmpTa = new TAttendance();
 
+		/** pushテスト用 **/
+		String tmpLineId = mUserDao.getByPk(119229).getLineId();
+		logger.debug("lineId: " + tmpLineId);
+		// logger.debug("★pushテスト結果: " + LineAPIService.pushMessage(tmpLineId,"pushてすと"));
+		logger.debug("★pushテストその2: ");
+		LineAPIService.pushMessage(tmpLineId,"push");
+
 		// アラートフラグがアラートなしならここで終了、アラートありなら続行
 		if (ms.getAlertFlag().equals("0")) {
 			logger.debug("打刻漏れ防止アラートが設定されていません。");
-			return -1;
+			return 0;
 		}
 
 		// 本日が営業日じゃないならここで終了、営業日なら続行
 		if (!getBusinessDay(ms).contains(beginCl.get(Calendar.DAY_OF_WEEK))) {
 			logger.debug("本日は営業日ではありません。");
-			return -2;
+			return 0;
 		}
 
 		// 今がアラートを出す時間ではないならここで終了、出す時間なら、出退どちらのアラートかを保持し続行
 		if ((alertMode = alertModeChecker(beginTime, endTime)) == 0) {
 			logger.debug("打刻漏れ防止アラートを出す時刻ではありません。");
-			return -3;
+			return 0;
 		}
 
 		// ユーザマスタにある全ユーザのリストがmuList、その1つをeachUserに入れてそれぞれ処理
