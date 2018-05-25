@@ -185,6 +185,7 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 			//修正済みメッセージを送信
 			String msg = AppMesssageSource.getMessage("line.saveAttendance");
 			LineAPIService.repryMessage(replyToken, msg);
+			lineStatus.setActionName(null);
 			logger.debug("editAction()editTimeEnd");
 
 		}
