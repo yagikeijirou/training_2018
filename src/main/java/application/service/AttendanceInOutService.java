@@ -62,7 +62,7 @@ public class AttendanceInOutService extends AbstractAttendanceService {
 		/*取得したユーザID,勤怠区分コード,リクエスト時刻から勤怠情報エンティティを取得*/
 		TAttendance t_attendance = tAttendanceDao.getByPk(mUser.getUserId(), "01", reqday);
 
-		System.out.println("勤怠情報は"+tAttendanceDao.getByPk(mUser.getUserId(), "01", reqday));
+		//System.out.println("勤怠情報は"+tAttendanceDao.getByPk(mUser.getUserId(), "01", reqday));
 
 		/*勤怠情報の勤怠時刻に既に出勤打刻が登録されていないか確認*/
 		if (t_attendance == null) {
@@ -86,26 +86,27 @@ public class AttendanceInOutService extends AbstractAttendanceService {
 
 			/**勤怠情報エンティティをDBに新規登録*/
 			tAttendanceDao.save(t_attendance);
+			logger.debug("saveTAttendance",t_attendance);
 
-			System.out.println("処理後の勤怠情報は"+tAttendanceDao.getByPk(mUser.getUserId(), "01", reqday));
+			//System.out.println("処理後の勤怠情報は"+tAttendanceDao.getByPk(mUser.getUserId(), "01", reqday));
 
 			if(tAttendanceDao.getByPk(mUser.getUserId(), "01", reqday) != null) {
 			/*メッセージをLINEアプリ上で表示させて処理を終了する*/
 			String msg = AppMesssageSource.getMessage("line.arrival");
-			//LineAPIService.repryMessage(replyToken, msg);
+			LineAPIService.repryMessage(replyToken, msg);
 
-			System.out.println(msg);
+			//System.out.println(msg);
 			}else {
-				System.out.println("登録が何らかの理由で失敗しました");
+				//System.out.println("登録が何らかの理由で失敗しました");
 			}
 
 		} else {
 			/*出勤時刻登録しないでエラーメッセージ表示する*/
 			String msg = AppMesssageSource.getMessage("line.api.err.savedArrival");
-			//LineAPIService.repryMessage(replyToken, msg);
+			LineAPIService.repryMessage(replyToken, msg);
 
-			System.out.println("処理後の勤怠情報は"+tAttendanceDao.getByPk(mUser.getUserId(), "01", reqday));
-			System.out.println(msg);
+			//System.out.println("処理後の勤怠情報は"+tAttendanceDao.getByPk(mUser.getUserId(), "01", reqday));
+			//System.out.println(msg);
 		}
 		logger.debug("putArrivalNow_End");
 	}
@@ -137,7 +138,7 @@ public class AttendanceInOutService extends AbstractAttendanceService {
 		/*取得したユーザID,勤怠区分コード,リクエスト時刻から勤怠情報エンティティを取得*/
 		TAttendance t_attendance = tAttendanceDao.getByPk(mUser.getUserId(), "02", reqday);
 
-		System.out.println("勤怠情報は"+tAttendanceDao.getByPk(mUser.getUserId(), "02", reqday));
+		//System.out.println("勤怠情報は"+tAttendanceDao.getByPk(mUser.getUserId(), "02", reqday));
 
 		/*勤怠情報の勤怠時刻に既に出勤打刻が登録されていないか確認*/
 		if ((t_attendance == null)) {
@@ -161,26 +162,27 @@ public class AttendanceInOutService extends AbstractAttendanceService {
 
 			/**勤怠情報エンティティをDBに新規登録*/
 			tAttendanceDao.save(t_attendance);
+			logger.debug("saveTAttendance",t_attendance);
 
-			System.out.println("処理後の勤怠情報は"+tAttendanceDao.getByPk(mUser.getUserId(), "02", reqday));
+			//System.out.println("処理後の勤怠情報は"+tAttendanceDao.getByPk(mUser.getUserId(), "02", reqday));
 
 			if(tAttendanceDao.getByPk(mUser.getUserId(), "02", reqday) != null) {
 			/*メッセージをLINEアプリ上で表示させて処理を終了する*/
 			String msg = AppMesssageSource.getMessage("line.clockOut");
-			//LineAPIService.repryMessage(replyToken, msg);
+			LineAPIService.repryMessage(replyToken, msg);
 
-			System.out.println(msg);
+			//System.out.println(msg);
 			}else {
-				System.out.println("登録が何らかの理由で失敗しました");
+				//System.out.println("登録が何らかの理由で失敗しました");
 			}
 
 		} else {
 			/*退勤時刻登録しないでエラーメッセージ表示する*/
 			String msg = AppMesssageSource.getMessage("line.api.err.savedClockOut");
-			//LineAPIService.repryMessage(replyToken, msg);
+			LineAPIService.repryMessage(replyToken, msg);
 
-			System.out.println("処理後の勤怠情報は"+tAttendanceDao.getByPk(mUser.getUserId(), "02", reqday));
-			System.out.println(msg);
+			//System.out.println("処理後の勤怠情報は"+tAttendanceDao.getByPk(mUser.getUserId(), "02", reqday));
+			//System.out.println(msg);
 		}
 		logger.debug("putClockOutNow_End");
 	}
