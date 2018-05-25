@@ -103,7 +103,7 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 				tmpTa = tAttendanceDao.getByPk(eachUser.getUserId(), AttenanceCd.getByName("出勤").getCode(),
 						CommonUtils.toYyyyMmDd(beginTime));
 				if (tmpTa == null) {
-					//LineAPIService.pushMessage(eachUser.getLineId(), AppMesssageSource.getMessage("line.alertNotFoundAttendance", "出勤"));
+					LineAPIService.pushMessage(eachUser.getLineId(), AppMesssageSource.getMessage("line.alertNotFoundAttendance", "出勤"));
 					System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
 					System.out.println(AppMesssageSource.getMessage("line.alertNotFoundAttendance", "出勤"));
 					System.out.println("lineId: " + eachUser.getLineId());
@@ -119,7 +119,7 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 						CommonUtils.toYyyyMmDd(beginTime));
 				if (tmpTa == null) {
 					// 最新勤怠情報が出勤 -> 退勤漏れ -> 退勤打刻漏れ防止アラート
-					//LineAPIService.pushMessage(eachUser.getLineId(), AppMesssageSource.getMessage("line.alertNotFoundAttendance", "退勤"));
+					LineAPIService.pushMessage(eachUser.getLineId(), AppMesssageSource.getMessage("line.alertNotFoundAttendance", "退勤"));
 					System.out.println("★★★★★★★★★★★★★★★★★★★★★★★");
 					System.out.println(AppMesssageSource.getMessage("line.alertNotFoundAttendance", "退勤"));
 					System.out.println("lineId: " + eachUser.getLineId());
