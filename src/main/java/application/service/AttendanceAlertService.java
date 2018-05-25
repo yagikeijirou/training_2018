@@ -77,7 +77,7 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		logger.debug("lineId: " + tmpLineId);
 		// logger.debug("★pushテスト結果: " + LineAPIService.pushMessage(tmpLineId,"pushてすと"));
 		logger.debug("★pushテストその2: ");
-		LineAPIService.pushMessage(tmpLineId,"push");
+		LineAPIService.pushMessage(tmpLineId, "push");
 
 		// アラートフラグがアラートなしならここで終了、アラートありなら続行
 		if (ms.getAlertFlag().equals("0")) {
@@ -99,6 +99,10 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 
 		// ユーザマスタにある全ユーザのリストがmuList、その1つをeachUserに入れてそれぞれ処理
 		for (MUser eachUser : muList) {
+			// LINE識別子を持っていないユーザの場合、次へ進む
+			if (eachUser.getLineId() == null) {
+				continue;
+			}
 
 			// 出勤アラートを出すとき
 			if (alertMode == 1) {
