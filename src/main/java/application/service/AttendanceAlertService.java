@@ -72,13 +72,6 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		/** アラート出力用一時勤怠情報 **/
 		TAttendance tmpTa = new TAttendance();
 
-		/** pushテスト用 **/
-		String tmpLineId = mUserDao.getByPk(119229).getLineId();
-		logger.debug("lineId: " + tmpLineId);
-		// logger.debug("★pushテスト結果: " + LineAPIService.pushMessage(tmpLineId,"pushてすと"));
-		logger.debug("★pushテストその2: ");
-		LineAPIService.pushMessage(tmpLineId, "push");
-
 		// アラートフラグがアラートなしならここで終了、アラートありなら続行
 		if (ms.getAlertFlag().equals("0")) {
 			logger.debug("打刻漏れ防止アラートが設定されていません。");
@@ -108,7 +101,8 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 			if (alertMode == 1) {
 				tmpTa = tAttendanceDao.getByPk(eachUser.getUserId(), AttenanceCd.getByName("出勤").getCode(),
 						CommonUtils.toYyyyMmDd(beginTime));
-				if (tmpTa == null) {
+				if (tmpTa == null && eachUser.getLineId() != null) {
+					logger.debug(eachUser.getLineId());
 					LineAPIService.pushMessage(eachUser.getLineId(),
 							AppMesssageSource.getMessage("line.alertNotFoundAttendance", "出勤"));
 					logger.debug(AppMesssageSource.getMessage("line.alertNotFoundAttendance", "出勤"));
@@ -123,8 +117,8 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 			else if (alertMode == 2) {
 				tmpTa = tAttendanceDao.getByPk(eachUser.getUserId(), AttenanceCd.getByName("退勤").getCode(),
 						CommonUtils.toYyyyMmDd(beginTime));
-				if (tmpTa == null) {
-					// 最新勤怠情報が出勤 -> 退勤漏れ -> 退勤打刻漏れ防止アラート
+				if (tmpTa == null && eachUser.getLineId() != null) {
+					logger.debug(eachUser.getLineId());
 					LineAPIService.pushMessage(eachUser.getLineId(),
 							AppMesssageSource.getMessage("line.alertNotFoundAttendance", "退勤"));
 					logger.debug(AppMesssageSource.getMessage("line.alertNotFoundAttendance", "退勤"));
