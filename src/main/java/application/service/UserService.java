@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,8 +25,8 @@ import application.entity.MUser;
 @Transactional
 public class UserService {
 
-	@Autowired
-	private PasswordEncoder passwordEncoder;
+//	@Autowired
+//	private PasswordEncoder passwordEncoder;
 
 	@Autowired
 	MUserDao muserDao;
@@ -203,15 +202,15 @@ public class UserService {
 	 * select2用の上司配列を返す。
 	 * @return Map<String,List<Map<String,Object>>> 連想配列
 	 */
-	public Map<String, Object> select2ManagerList() {
-		List<MOrg> mOrgs = morgDao.getAll();
+	public Map<String, Object> select2ManagerList(String orgCd) {
+		List<MUser> mUsers = muserDao.getAllManagerByOrgCd(orgCd);
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-		Map<String, Object> map = new HashMap<String, Object>();
 		Map<String, Object> map2 = new HashMap<String, Object>();
 
-		for (MOrg mo : mOrgs) {
-			map.put("id", mo.getOrgCd());
-			map.put("text", mo.getOrgName());
+		for (MUser mu : mUsers) {
+			Map<String, Object> map = new HashMap<String, Object>();
+			map.put("id", mu.getUserId());
+			map.put("text", mu.getName());
 			list.add(map);
 		}
 		map2.put("results", list);
@@ -223,19 +222,21 @@ public class UserService {
 	 * @return Map<String,List<Map<String,Object>>> 連想配列
 	 */
 	public Map<String, Object> select2AuthList() {
-		Map<String, Object> map = new HashMap<String, Object>();
-		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+		Map<String, Object> map1 = new HashMap<String, Object>();
 		Map<String, Object> map2 = new HashMap<String, Object>();
-		map.put("id", "01");
-		map.put("text", "一般");
-		list.add(map);
-		map.put("id", "02");
-		map.put("text", "上長");
-		list.add(map);
-		map.put("id", "03");
-		map.put("text", "管理者");
-		list.add(map);
-		map2.put("results",map);
-		return map2;
+		Map<String, Object> map3 = new HashMap<String, Object>();
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+		Map<String, Object> map4 = new HashMap<String, Object>();
+		map1.put("id", "01");
+		map1.put("text", "一般");
+		list.add(map1);
+		map2.put("id", "02");
+		map2.put("text", "上長");
+		list.add(map2);
+		map3.put("id", "03");
+		map3.put("text", "管理者");
+		list.add(map3);
+		map4.put("results", list);
+		return map4;
 	}
 }

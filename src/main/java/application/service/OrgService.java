@@ -104,10 +104,10 @@ public class OrgService {
 	public Map<String, Object> select2OrgList() {
 		List<MOrg> mOrgs = morgDao.getAll();
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-		Map<String, Object> map = new HashMap<String, Object>();
 		Map<String, Object> map2 = new HashMap<String, Object>();
 
 		for (MOrg mo : mOrgs) {
+			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("id", mo.getOrgCd());
 			map.put("text", mo.getOrgName());
 			list.add(map);

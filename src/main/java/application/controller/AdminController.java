@@ -35,7 +35,6 @@ import application.entity.MUser;
 import application.form.OrgForm;
 import application.form.SettingForm;
 import application.form.UserForm;
-import application.service.DivisionService;
 import application.service.ListOutputService;
 import application.service.OrgService;
 import application.service.SettingService;
@@ -73,9 +72,9 @@ public class AdminController {
 	@Autowired
 	private OrgService orgService;
 
-	/** 区分サービス。*/
-	@Autowired
-	private DivisionService divisionService;
+//	/** 区分サービス。*/
+//	@Autowired
+//	private DivisionService divisionService;
 
 	/** 設定サービス。*/
 	@Autowired
@@ -350,9 +349,6 @@ public class AdminController {
 	@RequestMapping(value = "/orgs/select2", method = RequestMethod.GET)
 	public @ResponseBody Map<String, Object> getOrgSelect2Data(@RequestParam(required = false) String q) {
 
-		/*
-		 * 未完成
-		 */
 		return orgService.select2OrgList();
 	}
 
@@ -367,12 +363,7 @@ public class AdminController {
 	public @ResponseBody Map<String, Object> getUserSelect2Data(@RequestParam(required = false) String orgCd,
 			@RequestParam(required = false) String name) {
 
-		/*
-		 * 未完成
-		 */
-
-		//return userService.select2ManagerList(orgCd);
-		return null;
+		return userService.select2ManagerList(orgCd);
 	}
 
 	/**
@@ -382,11 +373,6 @@ public class AdminController {
 	 */
 	@RequestMapping(value = "/auths/select2", method = RequestMethod.GET)
 	public @ResponseBody Map<String, Object> getAuthSelect2Data() {
-
-		/*
-		 * 未完成
-		 */
-
 
 		return userService.select2AuthList();
 	}
