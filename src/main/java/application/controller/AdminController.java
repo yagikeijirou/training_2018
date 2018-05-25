@@ -134,6 +134,7 @@ public class AdminController {
 	@RequestMapping(value = "/find-orgs", method = RequestMethod.GET)
 	public @ResponseBody Map<String, Object> findOrgs() {
 
+		log.debug("findOrgs()");
 		return orgService.getOrg();
 
 	}
@@ -147,6 +148,7 @@ public class AdminController {
 	@RequestMapping(value = "/find-org", method = RequestMethod.GET)
 	public @ResponseBody Map<String, Object> findOrg(@RequestParam(required = true) String orgCd) {
 
+		log.debug("requested org cd: {}", orgCd);
 		return orgService.getOrgMapByOrgCd(orgCd);
 	}
 
@@ -159,6 +161,7 @@ public class AdminController {
 	@RequestMapping(value = "/find-users", method = RequestMethod.GET)
 	public @ResponseBody Map<String, Object> findUsers(@RequestParam(required = false) String orgCd) {
 
+		log.debug("requested org cd: {}", orgCd);
 		return userService.getUser(orgCd);
 	}
 
@@ -171,6 +174,7 @@ public class AdminController {
 	@RequestMapping(value = "/find-user", method = RequestMethod.GET)
 	public @ResponseBody Map<String, Object> findUser(@RequestParam(required = true) Integer userId) {
 
+		log.debug("requested user id: {}", userId);
 		return userService.getUserMapByUserId(userId);
 	}
 
@@ -230,7 +234,7 @@ public class AdminController {
 	public ResponseEntity<Map<String, Object>> registerOrg(@Valid @ModelAttribute OrgForm orgForm,
 			BindingResult bindingResult) {
 
-		//エラー発生時、ログを書いてエラーを送出する
+		log.debug("requested org form: {}", orgForm);
 		if (bindingResult.hasErrors()) {
 			log.debug("validate error: {}", bindingResult.toString());
 			return genValidationErrorResponse(bindingResult);
@@ -253,7 +257,7 @@ public class AdminController {
 	public ResponseEntity<Map<String, Object>> updateOrgs(@Valid @ModelAttribute OrgForm orgForm,
 			BindingResult bindingResult) {
 
-		//エラー発生時、ログを書いてエラーを送出する
+		log.debug("requested org form: {}", orgForm);
 		if (bindingResult.hasErrors()) {
 			log.debug("validate error: {}", bindingResult.toString());
 			return genValidationErrorResponse(bindingResult);
@@ -274,9 +278,10 @@ public class AdminController {
 	@ResponseBody
 	public ResponseEntity<Map<String, Object>> deleteOrg(@RequestParam(value = "orgCd") String orgCd) {
 
+		log.debug("requested org cd: {}", orgCd);
 		MOrg mOrg = orgService.getOrgByOrgCd(orgCd);//組織コードからエンティティを取得
 		orgService.deleteOrg(mOrg); // 削除処理を実行
-		return null;//javascript側で引数resが使用されていないため、nullでよい？
+		return null;
 	}
 
 	/**
@@ -291,7 +296,7 @@ public class AdminController {
 	public ResponseEntity<Map<String, Object>> registerUser(@Valid @ModelAttribute UserForm userForm,
 			BindingResult bindingResult) {
 
-		//エラー発生時、ログを書いてエラーを送出する
+		log.debug("requested user form: {}", userForm);
 		if (bindingResult.hasErrors()) {
 			log.debug("validate error: {}", bindingResult.toString());
 			return genValidationErrorResponse(bindingResult);
@@ -315,7 +320,7 @@ public class AdminController {
 	public ResponseEntity<Map<String, Object>> updateUser(@Valid @ModelAttribute UserForm userForm,
 			BindingResult bindingResult) {
 
-		//log.debug("requested user form: {}", userForm);
+		log.debug("requested user form: {}", userForm);
 		if (bindingResult.hasErrors()) {
 			log.debug("validate error: {}", bindingResult.toString());
 			return genValidationErrorResponse(bindingResult);
@@ -323,7 +328,7 @@ public class AdminController {
 
 		userForm.setPassword(passwordEncoder.encode(userForm.getPassword()));//パスワードをハッシュ化する
 		MUser mUser = modelMapper.map(userForm, MUser.class); // フォームクラスからエンティティクラスにマッピングする
-		userService.updateUser(mUser); // 更新処理を実行
+		userService.updateUser(mUser);// 更新処理を実行
 		return null;
 	}
 
@@ -338,6 +343,7 @@ public class AdminController {
 	public ResponseEntity<Map<String, Object>> deleteUser(
 			@RequestParam(value = "userIds") List<Integer> userIds) {
 
+		log.debug("requested user ids: {}", userIds.toString());
 		userService.deleteSomeUsers(userIds);
 		return null;
 	}
@@ -351,6 +357,7 @@ public class AdminController {
 	@RequestMapping(value = "/orgs/select2", method = RequestMethod.GET)
 	public @ResponseBody Map<String, Object> getOrgSelect2Data(@RequestParam(required = false) String q) {
 
+		log.debug("getOrgSelect2Data()");
 		return orgService.select2OrgList();
 	}
 
@@ -365,6 +372,7 @@ public class AdminController {
 	public @ResponseBody Map<String, Object> getUserSelect2Data(@RequestParam(required = false) String orgCd,
 			@RequestParam(required = false) String name) {
 
+		log.debug("requested org cd: {}", orgCd);
 		return userService.select2ManagerList(orgCd);
 	}
 
@@ -376,6 +384,7 @@ public class AdminController {
 	@RequestMapping(value = "/auths/select2", method = RequestMethod.GET)
 	public @ResponseBody Map<String, Object> getAuthSelect2Data() {
 
+		log.debug("getAuthSelect2Data()");
 		return userService.select2AuthList();
 	}
 

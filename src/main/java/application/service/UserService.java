@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,12 +27,17 @@ import application.entity.MUser;
 @Transactional
 public class UserService {
 
+	/** このクラスのロガー。 */
+	private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
 	//	@Autowired
 	//	private PasswordEncoder passwordEncoder;
 
+	/** ユーザマスタ用DAO **/
 	@Autowired
 	MUserDao muserDao;
 
+	/** 組織マスタ用DAO **/
 	@Autowired
 	MOrgDao morgDao;
 
@@ -40,21 +47,8 @@ public class UserService {
 	 * @return Map<String,Object> ユーザ情報リスト
 	 */
 	public Map<String, Object> getUserMapByUserId(Integer userId) {
-		//		MUser mUser = muserDao.getByPk(userId);//ユーザIDからユーザエンティティを取得
-		//		MOrg mOrg = morgDao.getByPk(mUser.getOrgCd());//組織コードから所属している組織エンティティを取得
-		//		MUser manager = muserDao.getByPk(mUser.getManagerId());//上司IDから上司のエンティティを取得
-		//
-		//		Map<String, Object> map = new HashMap<>();
-		//		map.put("userId", mUser.getUserId());
-		//		map.put("name", mUser.getName());
-		//		map.put("mail", mUser.getMail());
-		//		map.put("orgCd", mUser.getOrgCd());
-		//		map.put("orgName", mOrg.getOrgName());//組織名
-		//		map.put("authCd", mUser.getAuthCd());
-		//		map.put("authName", muserDao.getAuthNameByAuthCd(mUser.getAuthCd()));//権限名
-		//		map.put("managerId", mUser.getManagerId());
-		//		map.put("managerName", manager.getName());//上司名
-		//		return map;
+
+		logger.debug("getUserMapByUserId()");
 
 		MUser mUser = muserDao.getByPk(userId);
 		MOrg mOrg = morgDao.getByPk(mUser.getOrgCd());
@@ -66,8 +60,8 @@ public class UserService {
 		if (mUser.getManagerId() != null) {
 			map.put("managerName", muserDao.getByPk(mUser.getManagerId()).getName());
 		}
-		return map;
 
+		return map;
 	}
 
 	/**
@@ -76,31 +70,14 @@ public class UserService {
 	 * @return Map<String,Object> ユーザ情報リスト
 	 */
 	public Map<String, Object> getUser(String orgCd) {
-		//    	List<MUser> mUsers = muserDao.getAllUserByOrgCd(orgCd);
-		//		Map<String, Object> map2 = new HashMap<String, Object>();
-		//		MOrg mOrg = morgDao.getByPk(orgCd);
-		//		int i = 0;
-		//
-		//		for(MUser mu : mUsers) {
-		//			Map<String, Object> map = new HashMap<String, Object>();
-		//			map.put("userId", mu.getUserId());
-		//			map.put("name", mu.getName());
-		//			map.put("mail", mu.getMail());
-		//			map.put("authName", muserDao.getAuthNameByAuthCd(mu.getAuthCd()));
-		//			map.put("orgName", mOrg.getOrgName());
-		//			map2.put(String.valueOf(i++), map);
-		//		}
-		//		return map2;
 
-		//    	List<MUser> mUsers = muserDao.getAllUserByOrgCd(orgCd);
-		//    	Map<String, Object> map = new HashMap<String, Object>();
-		//    	map.put("results", mUsers);
-		//    	return map;
+		logger.debug("getUser()");
 
 		Map<String, Object> map = new HashMap<String, Object>();
 		List<MUser> mUsers = muserDao.getAllUserByOrgCd(orgCd);
 		ArrayList<UserInfoDto> uids = new ArrayList<UserInfoDto>();
 		MOrg mOrg = morgDao.getByPk(orgCd);
+
 		for (MUser mu : mUsers) {
 			UserInfoDto uid = new UserInfoDto();
 			uid.setUserId(mu.getUserId().toString());
@@ -111,6 +88,7 @@ public class UserService {
 			uids.add(uid);
 		}
 		map.put("results", uids);
+
 		return map;
 	}
 
@@ -120,6 +98,7 @@ public class UserService {
 	 * @return ユーザ情報
 	 */
 	public Optional<MUser> getUserByUserId(Integer userId) {
+		logger.debug("getUserByUserId()");
 		return Optional.ofNullable(muserDao.getByPk(userId));
 	}
 
@@ -129,6 +108,7 @@ public class UserService {
 	 * @return ユーザ情報
 	 */
 	public Optional<MUser> getUserByMail(String mail) {
+		logger.debug("getUserByMail()");
 		return muserDao.selectByMail(mail);
 	}
 
@@ -138,6 +118,7 @@ public class UserService {
 	 * @return ユーザ情報
 	 */
 	public Optional<MUser> getUserByLineId(String lineId) {
+		logger.debug("getUserByLineId()");
 		return muserDao.selectByLineId(lineId);
 	}
 
@@ -148,6 +129,7 @@ public class UserService {
 	 * @return LINEアカウントが使用済のため登録できない場合
 	 */
 	public boolean registerLineId(Integer userId, String lineId) {
+		logger.debug("registerLineId()");
 		MUser user = muserDao.getByPk(userId);
 		if (StringUtils.equals(user.getLineId(), lineId)) {
 			// 既に登録済
@@ -174,6 +156,7 @@ public class UserService {
 	 * @author 黄倉大輔
 	 */
 	public void registerUser(MUser mUser) {
+		logger.debug("registerUser()");
 		muserDao.insert(mUser);
 	}
 
@@ -183,7 +166,8 @@ public class UserService {
 	 * @author 黄倉大輔
 	 */
 	public void updateUser(MUser mUser) {
-		muserDao.updateAsNullIsExclude(mUser);
+		logger.debug("updateUser()");
+		muserDao.update(mUser);
 	}
 
 	/**
@@ -194,6 +178,7 @@ public class UserService {
 	 * @throws NullPointerException 既に論理削除されているユーザを論理削除しようとした時
 	 */
 	public void deleteSomeUsers(List<Integer> userIds) {
+		logger.debug("deleteSomeUsers()");
 		for (Integer eachId : userIds) {
 			muserDao.delete(muserDao.getByPk(eachId));
 		}
@@ -201,9 +186,12 @@ public class UserService {
 
 	/**
 	 * select2用の上司配列を返す。
-	 * @return Map<String,List<Map<String,Object>>> 連想配列
+	 * @return Map<String,List<Map<String,Object>>> 上司情報リスト
 	 */
 	public Map<String, Object> select2ManagerList(String orgCd) {
+
+		logger.debug("select2ManagerList()");
+
 		List<MUser> mUsers = muserDao.getAllManagerByOrgCd(orgCd);
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		Map<String, Object> map2 = new HashMap<String, Object>();
@@ -215,19 +203,24 @@ public class UserService {
 			list.add(map);
 		}
 		map2.put("results", list);
+
 		return map2;
 	}
 
 	/**
 	 * select2用の権限配列を返す。
-	 * @return Map<String,List<Map<String,Object>>> 連想配列
+	 * @return Map<String,List<Map<String,Object>>> 権限情報リスト
 	 */
 	public Map<String, Object> select2AuthList() {
+
+		logger.debug("select2AuthList()");
+
 		Map<String, Object> map1 = new HashMap<String, Object>();
 		Map<String, Object> map2 = new HashMap<String, Object>();
 		Map<String, Object> map3 = new HashMap<String, Object>();
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		Map<String, Object> map4 = new HashMap<String, Object>();
+
 		map1.put("id", "01");
 		map1.put("text", "一般");
 		list.add(map1);
@@ -238,6 +231,7 @@ public class UserService {
 		map3.put("text", "管理者");
 		list.add(map3);
 		map4.put("results", list);
+
 		return map4;
 	}
 }
