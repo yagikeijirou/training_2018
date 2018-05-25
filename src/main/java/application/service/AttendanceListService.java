@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -79,19 +80,25 @@ public class AttendanceListService extends AbstractAttendanceService {
 			//リスト選択？
 		} else if (lineStatus.getActionName() != null) {
 			if (lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION)) {
-				user = mUserDao.getByPk(Integer.parseInt(text.split(" ")[0]));
+
+				try {
+					user = mUserDao.getByPk(Integer.parseInt(text.split(" ")[0]));
+				} catch (NumberFormatException e) {
+					LineAPIService.repryMessage(replyToken, "入力に誤りがある可能性があります");
+					return;
+				}
 				if (user == null) {
-					LineAPIService.repryMessage(replyToken, AppMesssageSource.getMessage("入力に誤りがある可能性があります。"));
+					LineAPIService.repryMessage(replyToken, "入力に誤りがある可能性があります");
 					return;
 				}
 				ym = CommonUtils.toYearMonth(lineStatus.getContents());
 			} else {
-				LineAPIService.repryMessage(replyToken, AppMesssageSource.getMessage("入力に誤りがある可能性があります。"));
+				LineAPIService.repryMessage(replyToken, "入力に誤りがある可能性があります");
 				return;
 			}
 
 		} else {
-			LineAPIService.repryMessage(replyToken, AppMesssageSource.getMessage("入力に誤りがある可能性があります。"));
+			LineAPIService.repryMessage(replyToken, "入力に誤りがある可能性があります");
 			return;
 		}
 
@@ -110,21 +117,29 @@ public class AttendanceListService extends AbstractAttendanceService {
 			TAttendance arrival_t, clock_out_t;
 
 			//カレンダー
-			Calendar cal = Calendar.getInstance();
-			cal.set(Calendar.YEAR, Integer.parseInt(ym.substring(0, 4)));
-			cal.set(Calendar.MONTH, Integer.parseInt(ym.substring(4, 6)));
-			int lastDayOfMonth = cal.getActualMaximum(Calendar.DATE);
+			Calendar cal;
+			int lastDayOfMonth;
+			try {
+				cal = new GregorianCalendar(Integer.parseInt(ym.substring(0, 4)),
+						Integer.parseInt(ym.substring(4, 6)) - 1, 1);
+				lastDayOfMonth = cal.getActualMaximum(Calendar.DATE);
+			} catch (NumberFormatException e) {
+				LineAPIService.repryMessage(replyToken, "入力に誤りがある可能性があります");
+				return;
+			}
 
 			//フォーマット
 			SimpleDateFormat sdf2 = new SimpleDateFormat("E");
 
 			//メッセージ作成(mm/dd(D) hh:mm ~ hh:mm #{"修正"}||#{""})
 			for (int i = 1; i <= lastDayOfMonth; i++) {
+
 				editFlg = false;
 
 				arrival_t = tAttendanceDao.getByPk(user.getUserId(), "01", ym + String.format("%02d", i));
 				clock_out_t = tAttendanceDao.getByPk(user.getUserId(), "02", ym + String.format("%02d", i));
-				msg.append(String.format("%02d", Integer.parseInt(ym.substring(4, 6))));
+
+				msg.append(ym.substring(4, 6));
 				msg.append("/");
 				msg.append(String.format("%02d", i));
 				msg.append("(");
@@ -206,7 +221,6 @@ public class AttendanceListService extends AbstractAttendanceService {
 
 			//テンプレートメッセージ送信
 			LineAPIService.pushButtons(lineId, AppMesssageSource.getMessage("line.selectMenu"), msgList);
-
 		}
 	}
 }
