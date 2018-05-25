@@ -11,7 +11,8 @@ import ninja.cero.sqltemplate.core.SqlTemplate;
 
 /**
  * 組織マスタDAO。
- * @author 隅田穂高(追記編集：黄倉大輔)
+ * @author 隅田穂高
+ * @author 黄倉大輔
  */
 @Component
 public class MOrgDao extends AbstractDao<MOrg> {
@@ -42,7 +43,8 @@ public class MOrgDao extends AbstractDao<MOrg> {
 
     /**
      * 全組織を取得する
-     * @param 組織エンティティ
+     *
+     * @return 組織エンティティリスト
      */
     public List<MOrg> getAll() {
 
@@ -52,7 +54,7 @@ public class MOrgDao extends AbstractDao<MOrg> {
     /**
      * PKで組織を取得する。
      * @param orgCd 組織コード
-     * @return 組織
+     * @return 組織エンティティ
      */
     public MOrg getByPk(String orgCd) {
         if (orgCd == null) {

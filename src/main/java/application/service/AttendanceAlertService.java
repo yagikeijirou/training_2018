@@ -54,6 +54,7 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 	 * @return 0以上の場合、アラートを出した人数。0未満の場合、終了コード。
 	 */
 	public int pushAlerts(Date beginTime, Date endTime) {
+
 		logger.debug("pushAlerts()");
 
 		/** beginTimeをCalendar型で持つための変数 **/
@@ -74,29 +75,34 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		// アラートフラグがアラートなしならここで終了、アラートありなら続行
 		if (ms.getAlertFlag().equals("0")) {
 			logger.debug("打刻漏れ防止アラートが設定されていません。");
-			return -1;
+			return 0;
 		}
 
 		// 本日が営業日じゃないならここで終了、営業日なら続行
 		if (!getBusinessDay(ms).contains(beginCl.get(Calendar.DAY_OF_WEEK))) {
 			logger.debug("本日は営業日ではありません。");
-			return -2;
+			return 0;
 		}
 
 		// 今がアラートを出す時間ではないならここで終了、出す時間なら、出退どちらのアラートかを保持し続行
 		if ((alertMode = alertModeChecker(beginTime, endTime)) == 0) {
 			logger.debug("打刻漏れ防止アラートを出す時刻ではありません。");
-			return -3;
+			return 0;
 		}
 
 		// ユーザマスタにある全ユーザのリストがmuList、その1つをeachUserに入れてそれぞれ処理
 		for (MUser eachUser : muList) {
+			// LINE識別子を持っていないユーザの場合、次へ進む
+			if (eachUser.getLineId() == null) {
+				continue;
+			}
 
 			// 出勤アラートを出すとき
 			if (alertMode == 1) {
 				tmpTa = tAttendanceDao.getByPk(eachUser.getUserId(), AttenanceCd.getByName("出勤").getCode(),
 						CommonUtils.toYyyyMmDd(beginTime));
-				if (tmpTa == null) {
+				if (tmpTa == null && eachUser.getLineId() != null) {
+					logger.debug(eachUser.getLineId());
 					LineAPIService.pushMessage(eachUser.getLineId(),
 							AppMesssageSource.getMessage("line.alertNotFoundAttendance", "出勤"));
 					logger.debug(AppMesssageSource.getMessage("line.alertNotFoundAttendance", "出勤"));
@@ -111,8 +117,8 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 			else if (alertMode == 2) {
 				tmpTa = tAttendanceDao.getByPk(eachUser.getUserId(), AttenanceCd.getByName("退勤").getCode(),
 						CommonUtils.toYyyyMmDd(beginTime));
-				if (tmpTa == null) {
-					// 最新勤怠情報が出勤 -> 退勤漏れ -> 退勤打刻漏れ防止アラート
+				if (tmpTa == null && eachUser.getLineId() != null) {
+					logger.debug(eachUser.getLineId());
 					LineAPIService.pushMessage(eachUser.getLineId(),
 							AppMesssageSource.getMessage("line.alertNotFoundAttendance", "退勤"));
 					logger.debug(AppMesssageSource.getMessage("line.alertNotFoundAttendance", "退勤"));

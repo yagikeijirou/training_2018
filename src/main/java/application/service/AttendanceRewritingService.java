@@ -31,6 +31,7 @@ import application.utils.CommonUtils;
  * 2018/05/23-須永寛紀-POSTされた情報をlineステータス情報に保存するコードに修正
  * 2018/05/24-須永寛紀-Date型にyyyyMMddkkmmを格納するコードを追記
  * 2018/05/25-須永寛紀-CommonUtilを使ったコードに変更
+ * 2018/05/25-須永寛紀-lineStatus.getActionName()がnullたっだ場合に対応
  *
  *         </pre>
  */
@@ -62,8 +63,9 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 		logger.debug("startRewriting()");
 		//3,LINE APIを用いて「修正する月日(mmdd)を入力してください」というテキストを送信する。
 		String msg = AppMesssageSource.getMessage("line.editMonthDate");
-		LineAPIService.repryMessage(replyToken, msg);
+		//LineAPIService.repryMessage(replyToken, msg);
 		logger.debug(msg);
+
 		logger.debug("startRewriting()end");
 
 	}
@@ -77,21 +79,25 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 	 */
 	public void editAction(String lineId, String replyToken, TLineStatus lineStatus, String text) {
 		logger.debug("editAction()");
-
 		if (text == null) {
-
+			logger.debug("editAction()textIsNull");
 			return;
+		}
+
+		if (lineStatus.getActionName() == null) {
+			lineStatus.setActionName(ACTION_EDIT_DATE);
+			logger.debug("editAction()ChangeActionName");
 		}
 
 		//4,LINEステータス情報を検索する。
 		//5,メニューコードとアクション名が適切か確認する。
-		if (lineStatus.getMenuCd().equals("03")
-				&& lineStatus.getActionName().equals(ACTION_EDIT_DATE)) {
+		if (lineStatus.getActionName().equals(ACTION_EDIT_DATE)) {
+			logger.debug("editAction()editDate");
 			String MMdd = CommonUtils.toMonthDate(text);
 			if (MMdd == null) {
 				String msg = AppMesssageSource.getMessage("line.editMonthDate");
-				LineAPIService.repryMessage(replyToken, msg);
-				logger.debug(msg);
+				//LineAPIService.repryMessage(replyToken, msg);
+				logger.debug("editAction()editDateFormatErr");
 				return;
 			}
 			String YyyyMmDd = CommonUtils.toYyyyMmDdByMmDd(MMdd);
@@ -104,17 +110,15 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 
 			//テンプレートメッセージ作成
 			List<String> msglist = new ArrayList<>(Arrays.asList("出勤", "退勤"));
-			LineAPIService.pushButtons(lineId, "line.selectAttendanceCd", msglist);
-
-			logger.debug("witchAttendance?");
+			//LineAPIService.pushButtons(lineId, "line.selectAttendanceCd", msglist);
+			logger.debug("editAction()editDateEnd");
 
 		}
 
 		//9,LINEステータス情報を検索する。
 		//10,アクション名が適切か確認する。
-		else if (lineStatus.getMenuCd().equals("03")
-				&& lineStatus.getActionName().equals(ACTION_EDIT_TYPE_SELECTION)) {
-
+		else if (lineStatus.getActionName().equals(ACTION_EDIT_TYPE_SELECTION)) {
+			logger.debug("editAction()editTypeSelection");
 			//11,フォーマットが適切かどうか確認する。
 			if (text.equals("出勤")) {
 				//12,POSTされた勤怠区分コードの情報をlineステータス情報の「ActionName」として格納する。
@@ -122,35 +126,34 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 				tLineStatusDao.update(lineStatus);
 				//13,LINE APIを用いて「新しい{0}時刻(hhmm)を入力してください	」というテキストを送信する。
 				String msg = AppMesssageSource.getMessage("line.newAttendanceInput");
-				LineAPIService.repryMessage(replyToken, msg);
-				logger.debug(msg);
+				//LineAPIService.repryMessage(replyToken, msg);
+				logger.debug("editAction()editTypeSelectionAllival");
 			} else if (text.equals("退勤")) {
 				//12,POSTされた勤怠区分コードの情報を勤怠情報エンティティ「attendanceCd」として格納する。
 				lineStatus.setActionName(ACTION_EDIT_INPUT_TIME_CLOCKOUT);
 				tLineStatusDao.update(lineStatus);
 				//13,LINE APIを用いて「新しい{1}時刻(hhmm)を入力してください	」というテキストを送信する。
 				String msg = AppMesssageSource.getMessage("line.newAttendanceInput");
-				LineAPIService.repryMessage(replyToken, msg);
-				logger.debug(msg);
+				//LineAPIService.repryMessage(replyToken, msg);
+				logger.debug("editAction()editTypeSelectionClockOut");
 			} else {
 				String msg = AppMesssageSource.getMessage("line.selectAttendanceCd");
-				LineAPIService.repryMessage(replyToken, msg);
-				logger.debug(msg);
+				//LineAPIService.repryMessage(replyToken, msg);
+				logger.debug("editAction()editTypeSelectionFormatErr");
 				return;
 			}
-
+			logger.debug("editAction()editTypeSelectionEnd");
 		}
 
 		//14,LINEステータス情報を検索する。
 		//15,メニューコードとアクション名が適切か確認する。
-		else if (lineStatus.getMenuCd().equals("03")
-				&& (lineStatus.getActionName().equals(ACTION_EDIT_INPUT_TIME_ARRIVAL)
-						|| lineStatus.getActionName().equals(ACTION_EDIT_INPUT_TIME_CLOCKOUT))) {
-
+		else if (lineStatus.getActionName().equals(ACTION_EDIT_INPUT_TIME_ARRIVAL)
+				|| lineStatus.getActionName().equals(ACTION_EDIT_INPUT_TIME_CLOCKOUT)) {
+			logger.debug("editAction()editTime");
 			String HourMinute = CommonUtils.toHourMinute(text);
 			if (HourMinute == null) {
 				String msg = AppMesssageSource.getMessage("line.newAttendanceInput");
-				LineAPIService.repryMessage(replyToken, msg);
+				//LineAPIService.repryMessage(replyToken, msg);
 				logger.debug(msg);
 				return;
 			}
@@ -163,25 +166,29 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 
 				tAttendance = tAttendanceDao.getByPk(lineStatus.getUserId(), "01",
 						YyyyMmDd);
-
+				logger.debug("editAction()editInputTimeArrival");
 			} else {
 				tAttendance = tAttendanceDao.getByPk(lineStatus.getUserId(), "02",
 						YyyyMmDd);
+				logger.debug("editAction()editInputTimeClockout");
 			}
 
 			if (tAttendance == null) {
 				String msg = AppMesssageSource.getMessage("line.api.err.notFoundAttendance");
-				LineAPIService.repryMessage(replyToken, msg);
-				logger.debug(msg);
+				//LineAPIService.repryMessage(replyToken, msg);
+				logger.debug("editAction()AttendanceNotFound");
 				return;
 			}
 			tAttendance.setAttendanceTime(yyyyMMddHHmm);
 			tAttendance.setEditFlg("1");
 			tAttendanceDao.update(tAttendance);
+			lineStatus.setActionName(null);
+			lineStatus.setContents(null);
+			tLineStatusDao.update(lineStatus);
 			//修正済みメッセージを送信
 			String msg = AppMesssageSource.getMessage("line.saveAttendance");
-			LineAPIService.repryMessage(replyToken, msg);
-			logger.debug(msg);
+			//LineAPIService.repryMessage(replyToken, msg);
+			logger.debug("editAction()editTimeEnd");
 
 		}
 		logger.debug("editAction()end");
