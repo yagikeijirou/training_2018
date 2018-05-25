@@ -198,4 +198,44 @@ public class UserService {
 			muserDao.delete(muserDao.getByPk(eachId));
 		}
 	}
+
+	/**
+	 * select2用の上司配列を返す。
+	 * @return Map<String,List<Map<String,Object>>> 連想配列
+	 */
+	public Map<String, Object> select2ManagerList() {
+		List<MOrg> mOrgs = morgDao.getAll();
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Object> map2 = new HashMap<String, Object>();
+
+		for (MOrg mo : mOrgs) {
+			map.put("id", mo.getOrgCd());
+			map.put("text", mo.getOrgName());
+			list.add(map);
+		}
+		map2.put("results", list);
+		return map2;
+	}
+
+	/**
+	 * select2用の権限配列を返す。
+	 * @return Map<String,List<Map<String,Object>>> 連想配列
+	 */
+	public Map<String, Object> select2AuthList() {
+		Map<String, Object> map = new HashMap<String, Object>();
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+		Map<String, Object> map2 = new HashMap<String, Object>();
+		map.put("id", "01");
+		map.put("text", "一般");
+		list.add(map);
+		map.put("id", "02");
+		map.put("text", "上長");
+		list.add(map);
+		map.put("id", "03");
+		map.put("text", "管理者");
+		list.add(map);
+		map2.put("results",map);
+		return map2;
+	}
 }
