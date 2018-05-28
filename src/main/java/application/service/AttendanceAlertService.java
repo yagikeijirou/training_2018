@@ -1,5 +1,7 @@
 package application.service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -151,11 +153,20 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		logger.debug("alertModeChecker()");
 
 		MSetting mSetting = mSettingDao.get();
-		String openTime = mSetting.getAlertOpenTime();
-		String openMinutes = mSetting.getAlertOpenMinutes();
+		//String openTime = mSetting.getAlertOpenTime();
+		//String openMinutes = mSetting.getAlertOpenMinutes();
+		String openTime = mSetting.getOpenTime();
+		String openMinutes = mSetting.getOpenMinutes();
 		String closeTime = mSetting.getAlertCloseTime();
 		String closeMinutes = mSetting.getAlertCloseMinutes();
+
+		//出勤打刻漏れ防止アラートの時間計算
 		Date openDate = CommonUtils.parseDate(CommonUtils.toYyyyMmDd() + openTime + openMinutes, "yyyyMMddHHmm");
+		LocalDateTime ldt = LocalDateTime.ofInstant(openDate.toInstant(), ZoneId.systemDefault());
+		ldt = ldt.minusMinutes(10);
+		System.out.println(ldt);
+		openDate = Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
+
 		Date closeDate = CommonUtils.parseDate(CommonUtils.toYyyyMmDd() + closeTime + closeMinutes, "yyyyMMddHHmm");
 
 		// 日付確認用
@@ -165,10 +176,10 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		System.out.println(endTime);
 		System.out.println("----------------------------");
 		System.out.println("- DB日付 -------------------");
-		System.out.println(CommonUtils.parseDate(CommonUtils.toYyyyMmDd() + openTime + openMinutes, "yyyyMMddHHmm"));
-		System.out.println(CommonUtils.parseDate(CommonUtils.toYyyyMmDd() + closeTime + closeMinutes, "yyyyMMddHHmm"));
+		System.out.println(openDate);
+		System.out.println(closeDate);
 		System.out.println("----------------------------");
-		*/
+		 */
 
 		// cron時刻範囲が出勤打刻漏れ防止アラート設定時刻を含むとき、return 1
 		if (openDate.after(beginTime) && openDate.before(endTime)) {
