@@ -27,7 +27,9 @@
                 </a>
             </td>
             <td class="vert-align col-md-1">
-                <i class="fa fa-minus text-danger" onclick="handleDeleteOrg('{{:orgCd}}')"></i>
+				<a class="btn btn-xs btn-danger" onclick="handleDeleteOrg('{{:orgCd}}')" href="#">
+                	<i class="fa fa-trash"></i>
+				</a>
             </td>
         </tr>
     	</script>
@@ -164,7 +166,7 @@
 						</form>
 						<div class="modal-footer">
 							<button type="button" id="org-register-button"
-								class="btn btn-success" onclick="handleRegisterOrg()">登録</button>
+								class="btn btn-primary" onclick="handleRegisterOrg()">登録</button>
 							<button type="button" id="org-update-button"
 								class="btn btn-primary" onclick="handleUpdateOrg()">保存</button>
 							<button type="button" class="btn btn-default"
@@ -234,7 +236,7 @@
 
 						</form>
 						<div class="modal-footer">
-							<button type="button" class="btn btn-success"
+							<button type="button" class="btn btn-primary"
 								id="user-register-button" onclick="handleRegisterUser()">登録</button>
 							<button type="button" class="btn btn-primary"
 								id="user-update-button" onclick="handleUpdateUser()">保存</button>
