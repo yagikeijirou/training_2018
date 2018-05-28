@@ -5,7 +5,9 @@ update m_user
       ,auth_cd = :authCd
       ,org_cd = :orgCd
       ,manager_id = :managerId
+    <#if lineId??>
       ,line_id = :lineId
+    </#if>
     <#if delFlg??>
       ,del_flg = :delFlg
     </#if>
