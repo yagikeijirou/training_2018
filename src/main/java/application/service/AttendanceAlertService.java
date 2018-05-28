@@ -75,19 +75,19 @@ public class AttendanceAlertService extends AbstractAttendanceService {
 		// アラートフラグがアラートなしならここで終了、アラートありなら続行
 		if (ms.getAlertFlag().equals("0")) {
 			logger.debug("打刻漏れ防止アラートが設定されていません。");
-			return 0;
+			return -1;
 		}
 
 		// 本日が営業日じゃないならここで終了、営業日なら続行
 		if (!getBusinessDay(ms).contains(beginCl.get(Calendar.DAY_OF_WEEK))) {
 			logger.debug("本日は営業日ではありません。");
-			return 0;
+			return -2;
 		}
 
 		// 今がアラートを出す時間ではないならここで終了、出す時間なら、出退どちらのアラートかを保持し続行
 		if ((alertMode = alertModeChecker(beginTime, endTime)) == 0) {
 			logger.debug("打刻漏れ防止アラートを出す時刻ではありません。");
-			return 0;
+			return -3;
 		}
 
 		// ユーザマスタにある全ユーザのリストがmuList、その1つをeachUserに入れてそれぞれ処理
