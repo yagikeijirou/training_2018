@@ -75,6 +75,11 @@ public class AttendanceListService extends AbstractAttendanceService {
 
 		//年月入力？
 		if (CommonUtils.toYearMonth(text) != null) {
+			if (lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION)) {
+				LineAPIService.repryMessage(replyToken, AppMesssageSource.getMessage("line.inputError"));
+				return;
+			}
+
 			user = mUserDao.getByLineId(lineId);
 			ym = CommonUtils.toYearMonth(text);
 			//リスト選択？
@@ -84,21 +89,21 @@ public class AttendanceListService extends AbstractAttendanceService {
 				try {
 					user = mUserDao.getByPk(Integer.parseInt(text.split(" ")[0]));
 				} catch (NumberFormatException e) {
-					LineAPIService.repryMessage(replyToken, "入力に誤りがある可能性があります");
+					LineAPIService.repryMessage(replyToken, AppMesssageSource.getMessage("line.inputError"));
 					return;
 				}
 				if (user == null) {
-					LineAPIService.repryMessage(replyToken, "入力に誤りがある可能性があります");
+					LineAPIService.repryMessage(replyToken, AppMesssageSource.getMessage("line.inputError"));
 					return;
 				}
 				ym = CommonUtils.toYearMonth(lineStatus.getContents());
 			} else {
-				LineAPIService.repryMessage(replyToken, "入力に誤りがある可能性があります");
+				LineAPIService.repryMessage(replyToken, AppMesssageSource.getMessage("line.inputError"));
 				return;
 			}
 
 		} else {
-			LineAPIService.repryMessage(replyToken, "入力に誤りがある可能性があります");
+			LineAPIService.repryMessage(replyToken, AppMesssageSource.getMessage("line.inputError"));
 			return;
 		}
 
@@ -124,12 +129,12 @@ public class AttendanceListService extends AbstractAttendanceService {
 						Integer.parseInt(ym.substring(4, 6)) - 1, 1);
 				lastDayOfMonth = cal.getActualMaximum(Calendar.DATE);
 			} catch (NumberFormatException e) {
-				LineAPIService.repryMessage(replyToken, "入力に誤りがある可能性があります");
+				LineAPIService.repryMessage(replyToken, AppMesssageSource.getMessage("line.inputError"));
 				return;
 			}
 
-			//フォーマット
-			SimpleDateFormat sdf2 = new SimpleDateFormat("E");
+			//曜日フォーマット
+			SimpleDateFormat sdf = new SimpleDateFormat("E");
 
 			//メッセージ作成(mm/dd(D) hh:mm ~ hh:mm #{"修正"}||#{""})
 			for (int i = 1; i <= lastDayOfMonth; i++) {
@@ -138,15 +143,18 @@ public class AttendanceListService extends AbstractAttendanceService {
 
 				arrival_t = tAttendanceDao.getByPk(user.getUserId(), "01", ym + String.format("%02d", i));
 				clock_out_t = tAttendanceDao.getByPk(user.getUserId(), "02", ym + String.format("%02d", i));
+				cal.set(Calendar.DATE, i);
 
+				//勤怠情報（月日・曜日）
 				msg.append(ym.substring(4, 6));
 				msg.append("/");
 				msg.append(String.format("%02d", i));
 				msg.append("(");
-				cal.set(Calendar.DATE, i);
-				msg.append(sdf2.format(cal.getTime()));
+				msg.append(sdf.format(cal.getTime()));
 				msg.append(") ");
 
+
+				//勤怠情報（時刻）
 				if (arrival_t != null && clock_out_t != null) {
 					//出勤レコード
 					msg.append(CommonUtils.toHMm(arrival_t.getAttendanceTime()));
@@ -220,7 +228,7 @@ public class AttendanceListService extends AbstractAttendanceService {
 			tLineStatusDao.save(lineStatus);
 
 			//テンプレートメッセージ送信
-			LineAPIService.pushButtons(lineId, AppMesssageSource.getMessage("line.selectMenu"), msgList);
+			LineAPIService.pushButtons(lineId, AppMesssageSource.getMessage("line.selectUserByList"), msgList);
 		}
 	}
 }
