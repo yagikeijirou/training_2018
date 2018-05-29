@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,6 +128,8 @@ public class AttendanceListService extends AbstractAttendanceService {
 			try {
 				cal = new GregorianCalendar(Integer.parseInt(ym.substring(0, 4)),
 						Integer.parseInt(ym.substring(4, 6)) - 1, 1);
+				cal.setTimeZone(TimeZone.getTimeZone("Asia/Tokyo"));
+
 				lastDayOfMonth = cal.getActualMaximum(Calendar.DATE);
 			} catch (NumberFormatException e) {
 				LineAPIService.repryMessage(replyToken, AppMesssageSource.getMessage("line.inputError"));
@@ -152,7 +155,6 @@ public class AttendanceListService extends AbstractAttendanceService {
 				msg.append("(");
 				msg.append(sdf.format(cal.getTime()));
 				msg.append(") ");
-
 
 				//勤怠情報（時刻）
 				if (arrival_t != null && clock_out_t != null) {
@@ -182,7 +184,9 @@ public class AttendanceListService extends AbstractAttendanceService {
 				if (editFlg) {
 					msg.append(" 修正");
 				}
-				msg.append(System.getProperty("line.separator"));
+				if (i != lastDayOfMonth) {
+					msg.append(System.getProperty("line.separator"));
+				}
 			}
 
 			//logger.debug("msg {}", msg);
