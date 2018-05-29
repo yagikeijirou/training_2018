@@ -62,6 +62,7 @@ public class AttendanceInOutService extends AbstractAttendanceService {
 
 		//System.out.println("勤怠情報は"+tAttendanceDao.getByPk(mUser.getUserId(), "01", reqday));
 
+
 		/*勤怠情報の勤怠時刻に既に出勤打刻が登録されていないか確認*/
 		if (t_attendance == null) {
 
@@ -88,9 +89,10 @@ public class AttendanceInOutService extends AbstractAttendanceService {
 			if (tAttendanceDao.getByPk(mUser.getUserId(), "01", reqday) != null) {
 				logger.debug("saveTAttendance", t_attendance);
 				/*メッセージをLINEアプリ上で表示させて処理を終了する*/
-				String msg = AppMesssageSource.getMessage("line.arrival",tLineStatus.getRequestTime());
+				String time = CommonUtils.toMDhMm(tLineStatus.getRequestTime());
+				String msg = AppMesssageSource.getMessage("line.arrival",time);
 				LineAPIService.repryMessage(replyToken, msg);
-
+				//System.out.println(msg);
 			} else {
 				//System.out.println("登録が何らかの理由で失敗しました");
 				logger.debug("saveErrorTAttendance", t_attendance);
@@ -101,6 +103,7 @@ public class AttendanceInOutService extends AbstractAttendanceService {
 			String msg = AppMesssageSource.getMessage("line.api.err.savedArrival");
 			LineAPIService.repryMessage(replyToken, msg);
 		}
+
 		logger.debug("putArrivalNow_End");
 	}
 
@@ -159,7 +162,8 @@ public class AttendanceInOutService extends AbstractAttendanceService {
 				if (tAttendanceDao.getByPk(mUser.getUserId(), "02", reqday) != null) {
 					logger.debug("saveTAttendance", t_attendance);
 					/*メッセージをLINEアプリ上で表示させて処理を終了する*/
-					String msg = AppMesssageSource.getMessage("line.clockOut",tLineStatus.getRequestTime());
+					String time = CommonUtils.toMDhMm(tLineStatus.getRequestTime());
+					String msg = AppMesssageSource.getMessage("line.clockOut",time);
 					LineAPIService.repryMessage(replyToken, msg);
 
 				} else {
