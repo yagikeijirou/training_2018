@@ -81,8 +81,6 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 		logger.debug("editAction()");
 		//出退勤を区別するフィールド。"出勤"か"退勤"が入る。
 		String attendanceCd = null;
-		logger.debug(lineStatus.getActionName());
-		LineAPIService.repryMessage(replyToken, "test");
 		if (text == null) {
 			String msg = AppMesssageSource.getMessage("word.noneInput");
 			LineAPIService.repryMessage(replyToken, msg);
@@ -112,7 +110,8 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 
 			//テンプレートメッセージ作成
 			List<String> msglist = new ArrayList<>(Arrays.asList("出勤", "退勤"));
-			LineAPIService.pushButtons(lineId, "line.selectAttendanceCd", msglist);
+			String msg = AppMesssageSource.getMessage("line.editMonthDate");
+			LineAPIService.pushButtons(lineId, msg, msglist);
 			logger.debug("editAction()editDateEnd");
 
 		}
