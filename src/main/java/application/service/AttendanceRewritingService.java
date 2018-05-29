@@ -81,7 +81,8 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 		logger.debug("editAction()");
 		//出退勤を区別するフィールド。"出勤"か"退勤"が入る。
 		String attendanceCd = null;
-
+		logger.debug(lineStatus.getActionName());
+		LineAPIService.repryMessage(replyToken, "test");
 		if (text == null) {
 			String msg = AppMesssageSource.getMessage("word.noneInput");
 			LineAPIService.repryMessage(replyToken, msg);
@@ -96,7 +97,7 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 			logger.debug("editAction()ChangeActionName");
 		}
 
-
+		logger.debug(lineStatus.getActionName());
 
 		//4,LINEステータス情報を検索する。
 		//5,メニューコードとアクション名が適切か確認する。
