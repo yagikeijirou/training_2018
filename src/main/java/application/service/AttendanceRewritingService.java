@@ -90,18 +90,9 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 			logger.debug("editAction()textIsNull");
 			return;
 		}
-
-		if (lineStatus.getActionName() == null) {
-			lineStatus.setActionName(ACTION_EDIT_DATE);
-			tLineStatusDao.update(lineStatus);
-			logger.debug("editAction()ChangeActionName");
-		}
-
-		logger.debug(lineStatus.getActionName());
-
 		//4,LINEステータス情報を検索する。
 		//5,メニューコードとアクション名が適切か確認する。
-		if (lineStatus.getActionName().equals(ACTION_EDIT_DATE)) {
+		if (lineStatus.getActionName().equals(ACTION_OPEN_MENU)) {
 			logger.debug("editAction()editDate");
 			String MMdd = CommonUtils.toMonthDate(text);
 			if (MMdd == null) {
