@@ -93,6 +93,7 @@ public class AttendanceListService extends AbstractAttendanceService {
 					LineAPIService.repryMessage(replyToken, AppMesssageSource.getMessage("line.inputError"));
 					return;
 				}
+
 				if (user == null) {
 					LineAPIService.repryMessage(replyToken, AppMesssageSource.getMessage("line.inputError"));
 					return;
@@ -115,6 +116,15 @@ public class AttendanceListService extends AbstractAttendanceService {
 
 		if (user.getAuthCd().equals("01") || (lineStatus.getActionName() != null
 				&& lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION))) {
+
+			if (mUserDao.getByLineId(lineId).getAuthCd().equals("02")) {
+				if (!user.getManagerId().equals(lineStatus.getUserId())) {
+					if (!user.getUserId().equals(lineStatus.getUserId())) {
+						LineAPIService.repryMessage(replyToken, AppMesssageSource.getMessage("line.inputError"));
+						return;
+					}
+				}
+			}
 
 			//月単位の勤怠情報
 			StringBuilder msg = new StringBuilder();
