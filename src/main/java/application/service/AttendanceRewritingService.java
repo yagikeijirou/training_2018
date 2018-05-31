@@ -100,6 +100,7 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 				logger.debug("editAction()editDateFormatErr");
 				return;
 			}
+
 			String YyyyMmDd = CommonUtils.toYyyyMmDdByMmDd(MMdd);
 
 			lineStatus.setContents(YyyyMmDd);
@@ -110,7 +111,7 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 
 			//テンプレートメッセージ作成
 			List<String> msglist = new ArrayList<>(Arrays.asList("出勤", "退勤"));
-			String msg = AppMesssageSource.getMessage("line.editMonthDate");
+			String msg = AppMesssageSource.getMessage("line.selectAttendanceCd");
 			LineAPIService.pushButtons(lineId, msg, msglist);
 			logger.debug("editAction()editDateEnd");
 
@@ -142,8 +143,9 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 				logger.debug(msg);
 				logger.debug("editAction()editTypeSelectionClockOut");
 			} else {
+				List<String> msglist = new ArrayList<>(Arrays.asList("出勤", "退勤"));
 				String msg = AppMesssageSource.getMessage("line.selectAttendanceCd");
-				LineAPIService.repryMessage(replyToken, msg);
+				LineAPIService.pushButtons(lineId, msg, msglist);
 				logger.debug(msg);
 				logger.debug("editAction()editTypeSelectionFormatErr");
 				return;
@@ -160,7 +162,12 @@ public class AttendanceRewritingService extends AbstractAttendanceService {
 			logger.debug("editAction()editTime");
 			String HourMinute = CommonUtils.toHourMinute(text);
 			if (HourMinute == null) {
-				String msg = AppMesssageSource.getMessage("line.newAttendanceInput","勤怠");
+				if(lineStatus.getActionName().equals(ACTION_EDIT_INPUT_TIME_ARRIVAL)) {
+					attendanceCd = "出勤";
+				}else{
+					attendanceCd = "退勤";
+				}
+				String msg = AppMesssageSource.getMessage("line.newAttendanceInput",attendanceCd);
 				LineAPIService.repryMessage(replyToken, msg);
 				logger.debug(msg);
 				logger.debug("editAction()editTimeFormatErr");
