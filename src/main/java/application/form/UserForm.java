@@ -11,6 +11,7 @@ import lombok.Data;
 
 /**
  * ユーザ情報登録フォーム
+ * @author 黄倉大輔(一部編集)
  */
 @Data
 public class UserForm {
@@ -19,6 +20,7 @@ public class UserForm {
 	@DecimalMax(value="999999")
     private Integer userId;
 	@NotNull
+	@Size(min=1, max=256)//0531黄倉追記
     private String password;
 	@NotNull
 	@Size(min=0, max=10)

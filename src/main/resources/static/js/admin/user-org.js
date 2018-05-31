@@ -26,7 +26,7 @@ function findOrg() {
                   });
 
               } else {
-                  $('#org-list').append("<tr><td><h4>データがありません。</h4></td></tr>");
+                  $('#org-list').append("<tr><td><h4>データがありません</h4></td></tr>");
               }
 
           }).fail(function(XMLHttpRequest, textStatus, errorThrown) {
@@ -64,7 +64,7 @@ function findUser(targetOrgCd) {
                   });
 
               } else {
-                  $('#user-list').append("<tr><td><h4>データがありません。</h4></td></tr>");
+                  $('#user-list').append("<tr><td><h4>データがありません</h4></td></tr>");
               }
 
           }).fail(function(XMLHttpRequest, textStatus, errorThrown) {
