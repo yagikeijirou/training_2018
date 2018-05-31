@@ -117,9 +117,14 @@ public class AttendanceListService extends AbstractAttendanceService {
 		if (user.getAuthCd().equals("01") || (lineStatus.getActionName() != null
 				&& lineStatus.getActionName().equals(ACTION_LIST_USER_SELECTION))) {
 
+			//直接入力に対するエラー処理
 			if (mUserDao.getByLineId(lineId).getAuthCd().equals("02")) {
-				if (!user.getManagerId().equals(lineStatus.getUserId())) {
-					if (!user.getUserId().equals(lineStatus.getUserId())) {
+				if (!user.getUserId().equals(lineStatus.getUserId())) {
+					if (user.getManagerId() == null) {
+						LineAPIService.repryMessage(replyToken, AppMesssageSource.getMessage("line.inputError"));
+						return;
+					}
+					if (!user.getManagerId().equals(lineStatus.getUserId())) {
 						LineAPIService.repryMessage(replyToken, AppMesssageSource.getMessage("line.inputError"));
 						return;
 					}
